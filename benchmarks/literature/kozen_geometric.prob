@@ -1,0 +1,19 @@
+// @METADATA:name        = kozen_geometric
+// @METADATA:description = Geometric distribution via rejection loop from
+//                         Kozen (1981) Section 5. Loop terminates with
+//                         probability 1 but has no finite bound. Key example
+//                         for probabilistic termination analysis.
+// @METADATA:reference   = Kozen (1981) Semantics of Probabilistic Programs.
+//                         J. Computer and System Sciences 22(3):328-350
+// @METADATA:criterion   = x
+// @METADATA:expected    = n and total sliced out; loop kept by ns; nids may slice
+// @METADATA:tags        = loop, nontermination, geometric, termination
+
+x :~ bernoulli(0.5);
+n := 0;
+while x = 0 do
+    x :~ bernoulli(0.5);
+    n := n + 1;
+end
+total := n + 1;
+return x;

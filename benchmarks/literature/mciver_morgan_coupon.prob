@@ -1,0 +1,32 @@
+// @METADATA:name        = mciver_morgan_coupon
+// @METADATA:description = Coupon collector approximation from McIver and Morgan
+//                         (2005) Chapter 9. Counts expected draws to collect
+//                         all coupons. Illustrates expected value reasoning.
+// @METADATA:reference   = McIver and Morgan (2005) Abstraction Refinement and
+//                         Proof for Probabilistic Systems. Springer Monographs
+//                         in Computer Science
+// @METADATA:criterion   = n
+// @METADATA:expected    = last sliced out; got1 and got2 kept via while guard;
+//                         n kept via data dep chain
+// @METADATA:tags        = loop, expected-value, coupon-collector
+
+coupon :~ unif[1, 2];
+got1   := 0;
+got2   := 0;
+if coupon = 1 then
+    got1 := 1;
+else
+    got2 := 1;
+end
+n := 1;
+while got1 + got2 < 2 do
+    coupon :~ unif[1, 2];
+    if coupon = 1 then
+        got1 := 1;
+    else
+        got2 := 1;
+    end
+    n := n + 1;
+end
+last := coupon;
+return n;

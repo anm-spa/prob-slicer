@@ -1,0 +1,15 @@
+// @METADATA:name        = prodigy_inference_loop_free_conditioning_murder_mystery
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/murder_mystery.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = withGun
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+aliceDunnit :~ unif[0, 1];
+if (aliceDunnit = 1) then
+  withGun :~ unif[0, 1];
+else
+  withGun :~ unif[0, 1];
+end
+observe(withGun = 1);
+return withGun;

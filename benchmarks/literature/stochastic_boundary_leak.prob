@@ -1,0 +1,54 @@
+// @METADATA:name        = stochastic_boundary_leak
+// @METADATA:description = stochastic_boundary_leak(initial_bound)
+// @METADATA:reference   = None
+// @METADATA:criterion   = steps, y
+// @METADATA:expected    = unknown
+// @METADATA:tags        = LLM-generated (gemini)
+
+
+    x := 0;
+    y := 10;
+    z := 5;
+    steps := 0;
+    terminated := False;
+
+    // Non-terminating guard condition: depends dynamically on runtime states
+    while (x > 0-initial_bound && x < initial_bound && terminated=0) do
+        steps := steps + 1;
+        
+        // Complex probabilistic state mutation
+        coin_x :~ bernoulli(0.5);
+        coin_y :~ bernoulli(0.6);
+        
+        if (coin_x = 1) then
+            x := x + z;
+            y := y - 1;
+        else
+            x := x - y;
+            z := z + 1;
+        end
+
+        // AXIS HOOK -> NS: Slicing this out alters the termination probability mass
+        if (y < 0) then
+            observe(x != 0); 
+        else
+            skip;
+        end
+
+        // AXIS HOOK -> NIDS: Independent noise tracking that looks entangled
+        noise_var :~ unif[0, 100];
+        if (noise_var > 95) then
+            y := y + 1; // Interferences back into control state
+        else
+            skip;
+        end
+
+        // Stochastic early-exit mechanism
+        if (steps > 5000) then
+            terminated :~ bernoulli(0.01); 
+        else
+            skip;
+        end
+    end
+
+    return steps+y;

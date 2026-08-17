@@ -1,0 +1,16 @@
+// @METADATA:name        = prodigy_loop_equivalence_invariants_random_walk_invariant
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/invariants/random_walk_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = s
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+if (s > 0) then
+  tmp :~ unif[0, 1];
+  c := c + tmp;
+  tmp := 0;
+  s := 0;
+else
+  skip;
+end
+return s;

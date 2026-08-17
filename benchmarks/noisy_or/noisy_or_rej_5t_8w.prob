@@ -1,0 +1,275 @@
+// @METADATA:name        = noisy_or_rej_5t_8w
+// @METADATA:description = Noisy-OR topic model with rejection sampling loop: 5 topics, 8 words. Loop resamples until all word observations pass. NS keeps loop, NI removes it.
+// @METADATA:reference   = Henrion (1987), Noisy-OR gates; BeanMachine PPLBench implementation
+// @METADATA:criterion   = node_1
+// @METADATA:expected    = ns_size > ni_size
+// @METADATA:tags        = generated noisy_or rejection_sampling
+
+// Noisy-OR Topic Model with Rejection Sampling Loop
+// 5 topics, 8 words
+// Loop resamples until all word observations pass
+// NS keeps loop; NI removes it -> variant distinction
+// Reference: Henrion (1987), BeanMachine PPLBench
+
+_accepted := 0;
+while (_accepted = 0) do
+
+  // Root node (always active)
+  node_0 := 1;
+  
+  // Topic nodes (latent)
+  // Topic 1: parents = [(0, 1)]
+  _acc_1 := 0;
+  _acc_1 := _acc_1 + node_0 * 1;
+  _coin_1 :~ unif[1, 1000];
+  node_1 := 0;
+  if (_acc_1 >= 1 && _coin_1 <= 632) then
+      node_1 := 1;
+  else
+      skip;
+  end
+  
+  // Topic 2: parents = [(0, 1)]
+  _acc_2 := 0;
+  _acc_2 := _acc_2 + node_0 * 1;
+  _coin_2 :~ unif[1, 1000];
+  node_2 := 0;
+  if (_acc_2 >= 1 && _coin_2 <= 632) then
+      node_2 := 1;
+  else
+      skip;
+  end
+  
+  // Topic 3: parents = [(0, 1)]
+  _acc_3 := 0;
+  _acc_3 := _acc_3 + node_0 * 1;
+  _coin_3 :~ unif[1, 1000];
+  node_3 := 0;
+  if (_acc_3 >= 1 && _coin_3 <= 632) then
+      node_3 := 1;
+  else
+      skip;
+  end
+  
+  // Topic 4: parents = [(0, 1)]
+  _acc_4 := 0;
+  _acc_4 := _acc_4 + node_0 * 1;
+  _coin_4 :~ unif[1, 1000];
+  node_4 := 0;
+  if (_acc_4 >= 1 && _coin_4 <= 632) then
+      node_4 := 1;
+  else
+      skip;
+  end
+  
+  // Topic 5: parents = [(0, 1)]
+  _acc_5 := 0;
+  _acc_5 := _acc_5 + node_0 * 1;
+  _coin_5 :~ unif[1, 1000];
+  node_5 := 0;
+  if (_acc_5 >= 1 && _coin_5 <= 632) then
+      node_5 := 1;
+  else
+      skip;
+  end
+  
+  // Word nodes — check all observations
+  _all_words_ok := 1;
+  
+  // Word 1: parents = [(1, 1)]
+  _acc_w1 := 0;
+  _acc_w1 := _acc_w1 + node_1 * 1;
+  _coin_w1 :~ unif[1, 1000];
+  _word_1 := 0;
+  if (_acc_w1 >= 1 && _coin_w1 <= 632) then
+      _word_1 := 1;
+  else
+      skip;
+  end
+  if (_word_1 = 0) then
+      _all_words_ok := 0;
+  else
+      skip;
+  end
+  
+  // Word 2: parents = [(2, 1), (5, 1), (1, 1)]
+  _acc_w2 := 0;
+  _acc_w2 := _acc_w2 + node_2 * 1;
+  _acc_w2 := _acc_w2 + node_5 * 1;
+  _acc_w2 := _acc_w2 + node_1 * 1;
+  _coin_w2 :~ unif[1, 1000];
+  _word_2 := 0;
+  if (_acc_w2 >= 1 && _coin_w2 <= 632) then
+      _word_2 := 1;
+  else
+      skip;
+  end
+  if (_acc_w2 >= 2 && _coin_w2 <= 865) then
+      _word_2 := 1;
+  else
+      skip;
+  end
+  if (_acc_w2 >= 3 && _coin_w2 <= 950) then
+      _word_2 := 1;
+  else
+      skip;
+  end
+  if (_word_2 = 0) then
+      _all_words_ok := 0;
+  else
+      skip;
+  end
+  
+  // Word 3: parents = [(5, 1)]
+  _acc_w3 := 0;
+  _acc_w3 := _acc_w3 + node_5 * 1;
+  _coin_w3 :~ unif[1, 1000];
+  _word_3 := 0;
+  if (_acc_w3 >= 1 && _coin_w3 <= 632) then
+      _word_3 := 1;
+  else
+      skip;
+  end
+  if (_word_3 = 0) then
+      _all_words_ok := 0;
+  else
+      skip;
+  end
+  
+  // Word 4: parents = [(5, 1)]
+  _acc_w4 := 0;
+  _acc_w4 := _acc_w4 + node_5 * 1;
+  _coin_w4 :~ unif[1, 1000];
+  _word_4 := 0;
+  if (_acc_w4 >= 1 && _coin_w4 <= 632) then
+      _word_4 := 1;
+  else
+      skip;
+  end
+  if (_word_4 = 0) then
+      _all_words_ok := 0;
+  else
+      skip;
+  end
+  
+  // Word 5: parents = [(1, 1), (5, 1), (4, 1), (3, 1)]
+  _acc_w5 := 0;
+  _acc_w5 := _acc_w5 + node_1 * 1;
+  _acc_w5 := _acc_w5 + node_5 * 1;
+  _acc_w5 := _acc_w5 + node_4 * 1;
+  _acc_w5 := _acc_w5 + node_3 * 1;
+  _coin_w5 :~ unif[1, 1000];
+  _word_5 := 0;
+  if (_acc_w5 >= 1 && _coin_w5 <= 632) then
+      _word_5 := 1;
+  else
+      skip;
+  end
+  if (_acc_w5 >= 2 && _coin_w5 <= 865) then
+      _word_5 := 1;
+  else
+      skip;
+  end
+  if (_acc_w5 >= 3 && _coin_w5 <= 950) then
+      _word_5 := 1;
+  else
+      skip;
+  end
+  if (_acc_w5 >= 4 && _coin_w5 <= 982) then
+      _word_5 := 1;
+  else
+      skip;
+  end
+  if (_word_5 = 0) then
+      _all_words_ok := 0;
+  else
+      skip;
+  end
+  
+  // Word 6: parents = [(5, 1), (1, 1)]
+  _acc_w6 := 0;
+  _acc_w6 := _acc_w6 + node_5 * 1;
+  _acc_w6 := _acc_w6 + node_1 * 1;
+  _coin_w6 :~ unif[1, 1000];
+  _word_6 := 0;
+  if (_acc_w6 >= 1 && _coin_w6 <= 632) then
+      _word_6 := 1;
+  else
+      skip;
+  end
+  if (_acc_w6 >= 2 && _coin_w6 <= 865) then
+      _word_6 := 1;
+  else
+      skip;
+  end
+  if (_word_6 = 0) then
+      _all_words_ok := 0;
+  else
+      skip;
+  end
+  
+  // Word 7: parents = [(2, 1), (4, 1), (1, 1), (5, 1), (3, 1)]
+  _acc_w7 := 0;
+  _acc_w7 := _acc_w7 + node_2 * 1;
+  _acc_w7 := _acc_w7 + node_4 * 1;
+  _acc_w7 := _acc_w7 + node_1 * 1;
+  _acc_w7 := _acc_w7 + node_5 * 1;
+  _acc_w7 := _acc_w7 + node_3 * 1;
+  _coin_w7 :~ unif[1, 1000];
+  _word_7 := 0;
+  if (_acc_w7 >= 1 && _coin_w7 <= 632) then
+      _word_7 := 1;
+  else
+      skip;
+  end
+  if (_acc_w7 >= 2 && _coin_w7 <= 865) then
+      _word_7 := 1;
+  else
+      skip;
+  end
+  if (_acc_w7 >= 3 && _coin_w7 <= 950) then
+      _word_7 := 1;
+  else
+      skip;
+  end
+  if (_acc_w7 >= 4 && _coin_w7 <= 982) then
+      _word_7 := 1;
+  else
+      skip;
+  end
+  if (_acc_w7 >= 5 && _coin_w7 <= 993) then
+      _word_7 := 1;
+  else
+      skip;
+  end
+  if (_word_7 = 0) then
+      _all_words_ok := 0;
+  else
+      skip;
+  end
+  
+  // Word 8: parents = [(2, 1)]
+  _acc_w8 := 0;
+  _acc_w8 := _acc_w8 + node_2 * 1;
+  _coin_w8 :~ unif[1, 1000];
+  _word_8 := 0;
+  if (_acc_w8 >= 1 && _coin_w8 <= 632) then
+      _word_8 := 1;
+  else
+      skip;
+  end
+  if (_word_8 = 0) then
+      _all_words_ok := 0;
+  else
+      skip;
+  end
+  
+  if (_all_words_ok = 1) then
+      _accepted := 1;
+  else
+      skip;
+  end
+  
+end
+
+return node_1;

@@ -1,0 +1,14 @@
+// @METADATA:name        = prodigy_loop_equivalence_trivial_iid
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/trivial_iid.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = n
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (0 < n) do
+  tmp :~ unif[1, 6];
+  m := m + tmp;
+  tmp := 0;
+  n := n - 1;
+end
+return n;

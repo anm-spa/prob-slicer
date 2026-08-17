@@ -1,0 +1,17 @@
+// @METADATA:name        = prodigy_evt_invariants_modulo_geometric
+// @METADATA:description = Translated from Prodigy pGCL: evt_invariants/modulo_geometric.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = x
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated evt_invariants
+
+x :~ unif[0, 1];
+while (x % 2 = 1) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    x := x + 2;
+  else
+    x := x + 1;
+  end
+end
+return x;

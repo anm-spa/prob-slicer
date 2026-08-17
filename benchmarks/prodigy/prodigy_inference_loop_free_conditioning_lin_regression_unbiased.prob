@@ -1,0 +1,16 @@
+// @METADATA:name        = prodigy_inference_loop_free_conditioning_lin_regression_unbiased
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/lin_regression_unbiased.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = y2
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+a :~ unif[1, 10];
+b :~ unif[1, 10];
+x1 := 5;
+y1 := 3 * x1 + 7;
+x2 := 3;
+y2 := 3 * x2 + 7;
+observe(y1 = a * x1 + b);
+observe(y2 = a * x2 + b);
+return y2;

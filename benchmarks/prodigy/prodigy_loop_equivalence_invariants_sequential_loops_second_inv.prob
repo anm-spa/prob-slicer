@@ -1,0 +1,16 @@
+// @METADATA:name        = prodigy_loop_equivalence_invariants_sequential_loops_second_inv
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/invariants/sequential_loops_second_inv.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = m
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+if (m > 0) then
+  tmp :~ unif[0, 1];
+  c := c + tmp;
+  tmp := 0;
+  m := 0;
+else
+  skip;
+end
+return m;

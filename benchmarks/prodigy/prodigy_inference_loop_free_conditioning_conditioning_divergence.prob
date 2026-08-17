@@ -1,0 +1,18 @@
+// @METADATA:name        = prodigy_inference_loop_free_conditioning_conditioning_divergence
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/conditioning_divergence.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = y
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+_coin :~ unif[0, 1];
+if (_coin <= 1 / 2) then
+  while (true) do
+    skip;
+  end
+else
+  x :~ unif[0, 1];
+  y :~ unif[0, 1];
+  observe(x = 0 || y = 0);
+end
+return y;

@@ -1,0 +1,17 @@
+// @METADATA:name        = prodigy_loop_equivalence_running_paper_example
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/running_paper_example.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = tmp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (x > 0) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    x := x - 1;
+  else
+    c := c + 1;
+  end
+  tmp := 0;
+end
+return tmp;

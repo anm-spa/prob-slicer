@@ -1,0 +1,18 @@
+// @METADATA:name        = kozen_random_walk
+// @METADATA:description = Random walk from Kozen (1981) Section 4. Classic
+//                         example illustrating probabilistic program semantics.
+// @METADATA:reference   = Kozen (1981) Semantics of Probabilistic Programs.
+//                         J. Computer and System Sciences 22(3):328-350
+// @METADATA:criterion   = x
+// @METADATA:expected    = steps sliced out; coin and both if-branches kept
+// @METADATA:tags        = basic, data-dependency, no-loop
+
+x    := 0;
+coin :~ bernoulli(0.5);
+if coin = 1 then
+    x := x + 1;
+else
+    x := x - 1;
+end
+steps := 1;
+return x;

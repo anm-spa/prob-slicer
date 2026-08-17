@@ -1,0 +1,28 @@
+// @METADATA:name        = paper_p4
+// @METADATA:description = Program P4 from Figure 8 of the paper.
+//                         Illustrates observe-nontermination dependence.
+//                         observe(x+y>=6) conditions on x and y jointly.
+//                         The while loop (line 4) may not terminate when
+//                         x=4. Under ns, the while predicate is an obsntd
+//                         source and generates obsntd edges to return x.
+//                         Under nids, the while predicate is also an
+//                         obsntd_nt source but wcd gives fewer edges.
+//                         Under ni, only observe is a source.
+// @METADATA:reference   = Masud and Olmedo (2026) Static Nontermination-
+//                         (In)Sensitive Slicing of Probabilistic Programs.
+//                         Figure 8, Program P4.
+// @METADATA:criterion   = x
+// @METADATA:expected    = ns: observe and while both in slice via obsntd;
+//                         nids: observe in slice; while kept via obsntd_nt
+//                         with wcd; ni: only observe kept as source;
+//                         y always kept via observe dependence on x
+// @METADATA:tags        = observe, nontermination, obsntd, paper-example,
+//                         figure-8, ns-vs-nids-vs-ni
+
+x :~ unif[1, 4];
+y :~ unif[1, 4];
+observe(x + y >= 6);
+while x = 4 do
+    skip;
+end
+return x;

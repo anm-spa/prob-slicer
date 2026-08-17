@@ -1,0 +1,68 @@
+// @METADATA:name        = ns_ni_gap_50irr
+// @METADATA:description = NS vs NI gap: nonterminating branch + 50 irrelevant variables. NI removes coin+while, NS keeps them.
+// @METADATA:reference   = generated/variant_distinction
+// @METADATA:criterion   = x
+// @METADATA:expected    = ns_size > ni_size
+// @METADATA:tags        = generated variant_distinction ns_ni
+
+x :~ unif[1, 4];
+coin :~ unif[0, 1];
+a0 :~ unif[1, 4];
+a1 :~ unif[1, 4];
+a2 :~ unif[1, 4];
+a3 :~ unif[1, 4];
+a4 :~ unif[1, 4];
+a5 :~ unif[1, 4];
+a6 :~ unif[1, 4];
+a7 :~ unif[1, 4];
+a8 :~ unif[1, 4];
+a9 :~ unif[1, 4];
+a10 :~ unif[1, 4];
+a11 :~ unif[1, 4];
+a12 :~ unif[1, 4];
+a13 :~ unif[1, 4];
+a14 :~ unif[1, 4];
+a15 :~ unif[1, 4];
+a16 :~ unif[1, 4];
+a17 :~ unif[1, 4];
+a18 :~ unif[1, 4];
+a19 :~ unif[1, 4];
+a20 :~ unif[1, 4];
+a21 :~ unif[1, 4];
+a22 :~ unif[1, 4];
+a23 :~ unif[1, 4];
+a24 :~ unif[1, 4];
+a25 :~ unif[1, 4];
+a26 :~ unif[1, 4];
+a27 :~ unif[1, 4];
+a28 :~ unif[1, 4];
+a29 :~ unif[1, 4];
+a30 :~ unif[1, 4];
+a31 :~ unif[1, 4];
+a32 :~ unif[1, 4];
+a33 :~ unif[1, 4];
+a34 :~ unif[1, 4];
+a35 :~ unif[1, 4];
+a36 :~ unif[1, 4];
+a37 :~ unif[1, 4];
+a38 :~ unif[1, 4];
+a39 :~ unif[1, 4];
+a40 :~ unif[1, 4];
+a41 :~ unif[1, 4];
+a42 :~ unif[1, 4];
+a43 :~ unif[1, 4];
+a44 :~ unif[1, 4];
+a45 :~ unif[1, 4];
+a46 :~ unif[1, 4];
+a47 :~ unif[1, 4];
+a48 :~ unif[1, 4];
+a49 :~ unif[1, 4];
+if (coin = 1) then
+  while (true) do
+    skip;
+  end
+else
+  skip;
+end
+observe(x = 2);
+return x;

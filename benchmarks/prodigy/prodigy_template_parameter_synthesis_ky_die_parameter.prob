@@ -1,0 +1,80 @@
+// @METADATA:name        = prodigy_template_parameter_synthesis_ky_die_parameter
+// @METADATA:description = Translated from Prodigy pGCL: template_parameter_synthesis/ky_die_parameter.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = die
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated template_parameter_synthesis
+
+while (s < 7) do
+  if (s = 0) then
+    _coin :~ unif[0, 1];
+    if (_coin <= 1 / 2) then
+      s := 1;
+    else
+      s := 2;
+    end
+  else
+    if (s = 1) then
+      _coin :~ unif[0, 1];
+      if (_coin <= 1 / 2) then
+        s := 3;
+      else
+        s := 4;
+      end
+    else
+      if (s = 2) then
+        _coin :~ unif[0, 1];
+        if (_coin <= 1 / 2) then
+          s := 5;
+        else
+          s := 6;
+        end
+      else
+        if (s = 3) then
+          _coin :~ unif[0, 1];
+          if (_coin <= 1 / 2) then
+            s := 1;
+          else
+            s := 7;
+            die := 1;
+          end
+        else
+          if (s = 4) then
+            _coin :~ unif[0, 1];
+            if (_coin <= 1 / 2) then
+              s := 7;
+              die := 2;
+            else
+              s := 7;
+              die := 3;
+            end
+          else
+            if (s = 5) then
+              _coin :~ unif[0, 1];
+              if (_coin <= 1 / 2) then
+                s := 7;
+                die := 4;
+              else
+                s := 7;
+                die := 5;
+              end
+            else
+              if (s = 6) then
+                _coin :~ unif[0, 1];
+                if (_coin <= 1 / 2) then
+                  s := 2;
+                else
+                  s := 7;
+                  die := 6;
+                end
+              else
+                skip;
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+end
+return die;

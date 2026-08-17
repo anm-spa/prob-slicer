@@ -1,0 +1,18 @@
+// @METADATA:name        = prodigy_loop_equivalence_geometric_shifted
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/geometric_shifted.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = temp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (x > 0) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    x := 0;
+    c := c + 3;
+  else
+    c := c + 1;
+  end
+  temp := 0;
+end
+return temp;

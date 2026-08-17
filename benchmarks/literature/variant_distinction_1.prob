@@ -1,0 +1,31 @@
+// @METADATA:name        = variant_distinction_1
+// @METADATA:description = Program where a statement AFTER a potentially
+//                         nonterminating loop is the criterion. Under ns,
+//                         the while predicate is scd-dependent on the
+//                         post-loop statement (nonterminating path never
+//                         reaches it). Under nids/ni, the while predicate
+//                         is NOT wcd-dependent on the post-loop statement
+//                         (it post-dominates the while node).
+//                         This is the canonical ns vs nids distinction.
+// @METADATA:reference   = Olmedo Gretz Jansen Kaminski Katoen McIver
+//                         (2018) Conditioning in Probabilistic Programs.
+//                         TOPLAS 2018. Section 5.
+// @METADATA:criterion   = result
+// @METADATA:expected    = ns: loop kept (while scd-depends on result);
+//                         nids: loop sliced (while not wcd-depends on
+//                         result since result post-dominates while);
+//                         ni: same as nids
+// @METADATA:tags        = loop, nontermination, ns-vs-nids, key-example
+
+coin :~ bernoulli(0.5);
+// Loop may not terminate
+while coin = 1 do
+    coin :~ bernoulli(0.5);
+end
+// result is AFTER the loop — post-dominates the while node
+// wcd: while NOT control-dep on result (result always executes if loop terminates)
+// scd: while IS control-dep on result (nonterminating path never reaches result)
+result :~ bernoulli(0.7);
+// Irrelevant
+z := 42;
+return result;

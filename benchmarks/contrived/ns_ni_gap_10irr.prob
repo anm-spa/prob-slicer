@@ -1,0 +1,28 @@
+// @METADATA:name        = ns_ni_gap_10irr
+// @METADATA:description = NS vs NI gap: nonterminating branch + 10 irrelevant variables. NI removes coin+while, NS keeps them.
+// @METADATA:reference   = generated/variant_distinction
+// @METADATA:criterion   = x
+// @METADATA:expected    = ns_size > ni_size
+// @METADATA:tags        = generated variant_distinction ns_ni
+
+x :~ unif[1, 4];
+coin :~ unif[0, 1];
+a0 :~ unif[1, 4];
+a1 :~ unif[1, 4];
+a2 :~ unif[1, 4];
+a3 :~ unif[1, 4];
+a4 :~ unif[1, 4];
+a5 :~ unif[1, 4];
+a6 :~ unif[1, 4];
+a7 :~ unif[1, 4];
+a8 :~ unif[1, 4];
+a9 :~ unif[1, 4];
+if (coin = 1) then
+  while (true) do
+    skip;
+  end
+else
+  skip;
+end
+observe(x = 2);
+return x;

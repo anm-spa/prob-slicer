@@ -1,0 +1,17 @@
+// @METADATA:name        = prodigy_template_parameter_synthesis_geometric_parameter
+// @METADATA:description = Translated from Prodigy pGCL: template_parameter_synthesis/geometric_parameter.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = temp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated template_parameter_synthesis
+
+while (x = 1) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 3) then
+    x := 0;
+  else
+    c := c + 1;
+  end
+  temp := 0;
+end
+return temp;

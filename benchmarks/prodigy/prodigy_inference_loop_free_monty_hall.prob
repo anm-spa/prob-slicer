@@ -1,0 +1,78 @@
+// @METADATA:name        = prodigy_inference_loop_free_monty_hall
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/monty_hall.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = otherdoor
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+prize :~ unif[0, 2];
+player :~ unif[0, 2];
+if (player = 0) then
+  if (prize = 0) then
+    opendoor :~ unif[1, 2];
+  else
+    if (prize = 1) then
+      opendoor := 2;
+    else
+      opendoor := 1;
+    end
+  end
+else
+  if (player = 1) then
+    if (prize = 0) then
+      opendoor := 2;
+    else
+      if (prize = 1) then
+        _coin :~ unif[0, 1];
+        if (_coin <= 1 / 2) then
+          opendoor := 0;
+        else
+          opendoor := 2;
+        end
+      else
+        opendoor := 0;
+      end
+    end
+  else
+    if (prize = 0) then
+      opendoor := 1;
+    else
+      if (prize = 1) then
+        opendoor := 0;
+      else
+        _coin :~ unif[0, 1];
+        if (_coin <= 1 / 2) then
+          opendoor := 0;
+        else
+          opendoor := 1;
+        end
+      end
+    end
+  end
+end
+if (opendoor = 0) then
+  if (player = 1) then
+    otherdoor := 2;
+  else
+    otherdoor := 1;
+  end
+else
+  if (opendoor = 1) then
+    if (player = 0) then
+      otherdoor := 2;
+    else
+      otherdoor := 0;
+    end
+  else
+    if (opendoor = 2) then
+      if (player = 0) then
+        otherdoor := 1;
+      else
+        otherdoor := 0;
+      end
+    else
+      skip;
+    end
+  end
+end
+return otherdoor;

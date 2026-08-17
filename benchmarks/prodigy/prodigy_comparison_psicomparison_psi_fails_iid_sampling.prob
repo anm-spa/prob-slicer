@@ -1,0 +1,10 @@
+// @METADATA:name        = prodigy_comparison_psicomparison_psi_fails_iid_sampling
+// @METADATA:description = Translated from Prodigy pGCL: comparison/psicomparison/psi_fails/iid_sampling.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = s
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated comparison
+
+n :~ unif[0, 1];
+s :~ unif[0, 1];
+return s;

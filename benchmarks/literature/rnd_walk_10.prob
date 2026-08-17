@@ -1,0 +1,30 @@
+// @METADATA:name        = rnd_walk_10
+// @METADATA:description = Random walk with 10 steps
+// @METADATA:reference   = generated/rnd_walk
+// @METADATA:criterion   = x0
+// @METADATA:expected    = unknown
+// @METADATA:tags        = generated
+
+x0 :~ unif[1, 4];
+step1 :~ unif[0, 1];
+x1 := x0 + step1;
+step2 :~ unif[0, 1];
+x2 := x1 + step2;
+step3 :~ unif[0, 1];
+x3 := x2 + step3;
+step4 :~ unif[0, 1];
+x4 := x3 + step4;
+step5 :~ unif[0, 1];
+x5 := x4 + step5;
+step6 :~ unif[0, 1];
+x6 := x5 + step6;
+step7 :~ unif[0, 1];
+x7 := x6 + step7;
+step8 :~ unif[0, 1];
+x8 := x7 + step8;
+step9 :~ unif[0, 1];
+x9 := x8 + step9;
+step10 :~ unif[0, 1];
+x10 := x9 + step10;
+observe(x10 > 2);
+return x0;

@@ -1,0 +1,13 @@
+// @METADATA:name        = bayes_net_4
+// @METADATA:description = Bayesian network with 4 variables
+// @METADATA:reference   = generated/bayes_net
+// @METADATA:criterion   = x0
+// @METADATA:expected    = unknown
+// @METADATA:tags        = generated
+
+x0 :~ unif[1, 4];
+x1 :~ unif[1, 4];
+x2 := x0 + x1;
+x3 := x1 + x2;
+observe(x3 = 3);
+return x0;

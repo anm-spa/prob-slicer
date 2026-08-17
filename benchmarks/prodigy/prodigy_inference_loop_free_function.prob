@@ -1,0 +1,11 @@
+// @METADATA:name        = prodigy_inference_loop_free_function
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/function.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = x
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+f := ;
+skip;
+x := f ( 2 );
+return x;

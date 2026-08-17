@@ -1,0 +1,137 @@
+// @METADATA:name        = trueskill_20_4_30
+// @METADATA:description = TrueSkill tournament: 20 teams, 4 players/team, 30 matches
+// @METADATA:reference   = Herbrich et al., TrueSkill (NeurIPS 2006)
+// @METADATA:criterion   = s_1_1
+// @METADATA:expected    = unknown
+// @METADATA:tags        = generated probabilistic
+
+// TrueSkill tournament: 20 teams, 4 players, 30 matches
+
+// --- Player skills ---
+s_1_1 :~ unif[0, 10];
+s_2_1 :~ unif[0, 10];
+s_3_1 :~ unif[0, 10];
+s_3_2 :~ unif[0, 10];
+s_3_3 :~ unif[0, 10];
+s_4_1 :~ unif[0, 10];
+s_4_2 :~ unif[0, 10];
+s_5_1 :~ unif[0, 10];
+s_5_2 :~ unif[0, 10];
+s_6_1 :~ unif[0, 10];
+s_6_2 :~ unif[0, 10];
+s_7_1 :~ unif[0, 10];
+s_8_1 :~ unif[0, 10];
+s_9_1 :~ unif[0, 10];
+s_9_2 :~ unif[0, 10];
+s_9_3 :~ unif[0, 10];
+s_9_4 :~ unif[0, 10];
+s_10_1 :~ unif[0, 10];
+s_11_1 :~ unif[0, 10];
+s_12_1 :~ unif[0, 10];
+s_13_1 :~ unif[0, 10];
+s_13_2 :~ unif[0, 10];
+s_14_1 :~ unif[0, 10];
+s_14_2 :~ unif[0, 10];
+s_15_1 :~ unif[0, 10];
+s_16_1 :~ unif[0, 10];
+s_16_2 :~ unif[0, 10];
+s_17_1 :~ unif[0, 10];
+s_17_2 :~ unif[0, 10];
+s_17_3 :~ unif[0, 10];
+s_17_4 :~ unif[0, 10];
+s_18_1 :~ unif[0, 10];
+s_18_2 :~ unif[0, 10];
+s_19_1 :~ unif[0, 10];
+s_19_2 :~ unif[0, 10];
+s_19_3 :~ unif[0, 10];
+s_19_4 :~ unif[0, 10];
+s_20_1 :~ unif[0, 10];
+s_20_2 :~ unif[0, 10];
+s_20_3 :~ unif[0, 10];
+
+// --- Team performances ---
+perf_1 := s_1_1;
+perf_2 := s_2_1;
+perf_3 := s_3_1 + s_3_2 + s_3_3;
+perf_4 := s_4_1 + s_4_2;
+perf_5 := s_5_1 + s_5_2;
+perf_6 := s_6_1 + s_6_2;
+perf_7 := s_7_1;
+perf_8 := s_8_1;
+perf_9 := s_9_1 + s_9_2 + s_9_3 + s_9_4;
+perf_10 := s_10_1;
+perf_11 := s_11_1;
+perf_12 := s_12_1;
+perf_13 := s_13_1 + s_13_2;
+perf_14 := s_14_1 + s_14_2;
+perf_15 := s_15_1;
+perf_16 := s_16_1 + s_16_2;
+perf_17 := s_17_1 + s_17_2 + s_17_3 + s_17_4;
+perf_18 := s_18_1 + s_18_2;
+perf_19 := s_19_1 + s_19_2 + s_19_3 + s_19_4;
+perf_20 := s_20_1 + s_20_2 + s_20_3;
+
+// --- Match observations ---
+noise_0 :~ unif[0, 1];
+observe(perf_1 + noise_0 > perf_3);
+noise_1 :~ unif[0, 1];
+observe(perf_3 + noise_1 > perf_7);
+noise_2 :~ unif[0, 1];
+observe(perf_15 + noise_2 > perf_19);
+noise_3 :~ unif[0, 1];
+observe(perf_17 + noise_3 > perf_7);
+noise_4 :~ unif[0, 1];
+observe(perf_6 + noise_4 > perf_9);
+noise_5 :~ unif[0, 1];
+observe(perf_5 + noise_5 > perf_7);
+noise_6 :~ unif[0, 1];
+observe(perf_3 + noise_6 > perf_6);
+noise_7 :~ unif[0, 1];
+observe(perf_6 + noise_7 > perf_4);
+noise_8 :~ unif[0, 1];
+observe(perf_8 + noise_8 > perf_6);
+noise_9 :~ unif[0, 1];
+observe(perf_10 + noise_9 > perf_2);
+noise_10 :~ unif[0, 1];
+observe(perf_7 + noise_10 > perf_2);
+noise_11 :~ unif[0, 1];
+observe(perf_6 + noise_11 > perf_19);
+noise_12 :~ unif[0, 1];
+observe(perf_8 + noise_12 > perf_2);
+noise_13 :~ unif[0, 1];
+observe(perf_13 + noise_13 > perf_6);
+noise_14 :~ unif[0, 1];
+observe(perf_6 + noise_14 > perf_10);
+noise_15 :~ unif[0, 1];
+observe(perf_13 + noise_15 > perf_12);
+noise_16 :~ unif[0, 1];
+observe(perf_4 + noise_16 > perf_18);
+noise_17 :~ unif[0, 1];
+observe(perf_1 + noise_17 > perf_13);
+noise_18 :~ unif[0, 1];
+observe(perf_8 + noise_18 > perf_14);
+noise_19 :~ unif[0, 1];
+observe(perf_10 + noise_19 > perf_13);
+noise_20 :~ unif[0, 1];
+observe(perf_15 + noise_20 > perf_2);
+noise_21 :~ unif[0, 1];
+observe(perf_18 + noise_21 > perf_6);
+noise_22 :~ unif[0, 1];
+observe(perf_4 + noise_22 > perf_2);
+noise_23 :~ unif[0, 1];
+observe(perf_10 + noise_23 > perf_17);
+noise_24 :~ unif[0, 1];
+observe(perf_11 + noise_24 > perf_5);
+noise_25 :~ unif[0, 1];
+observe(perf_12 + noise_25 > perf_19);
+noise_26 :~ unif[0, 1];
+observe(perf_12 + noise_26 > perf_17);
+noise_27 :~ unif[0, 1];
+observe(perf_6 + noise_27 > perf_14);
+noise_28 :~ unif[0, 1];
+observe(perf_14 + noise_28 > perf_11);
+noise_29 :~ unif[0, 1];
+observe(perf_16 + noise_29 > perf_3);
+
+// --- Query: skill of player 1 on team 1 ---
+return s_1_1;

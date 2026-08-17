@@ -1,0 +1,58 @@
+// @METADATA:name        = all_three_gap_scale10
+// @METADATA:description = All three variants differ (scale=10): NS > NIDS > NI expected. 10 observe vars, 20 irrelevant vars.
+// @METADATA:reference   = generated/variant_distinction
+// @METADATA:criterion   = x
+// @METADATA:expected    = ns_size > nids_size > ni_size
+// @METADATA:tags        = generated variant_distinction all_three
+
+x :~ unif[1, 4];
+coin :~ unif[0, 1];
+y0 :~ unif[1, 4];
+observe(y0 = 2);
+y1 :~ unif[1, 4];
+observe(y1 = 2);
+y2 :~ unif[1, 4];
+observe(y2 = 2);
+y3 :~ unif[1, 4];
+observe(y3 = 2);
+y4 :~ unif[1, 4];
+observe(y4 = 2);
+y5 :~ unif[1, 4];
+observe(y5 = 2);
+y6 :~ unif[1, 4];
+observe(y6 = 2);
+y7 :~ unif[1, 4];
+observe(y7 = 2);
+y8 :~ unif[1, 4];
+observe(y8 = 2);
+y9 :~ unif[1, 4];
+observe(y9 = 2);
+if (coin = 1) then
+  while (true) do
+    skip;
+  end
+else
+  skip;
+end
+z0 :~ unif[1, 4];
+z1 :~ unif[1, 4];
+z2 :~ unif[1, 4];
+z3 :~ unif[1, 4];
+z4 :~ unif[1, 4];
+z5 :~ unif[1, 4];
+z6 :~ unif[1, 4];
+z7 :~ unif[1, 4];
+z8 :~ unif[1, 4];
+z9 :~ unif[1, 4];
+z10 :~ unif[1, 4];
+z11 :~ unif[1, 4];
+z12 :~ unif[1, 4];
+z13 :~ unif[1, 4];
+z14 :~ unif[1, 4];
+z15 :~ unif[1, 4];
+z16 :~ unif[1, 4];
+z17 :~ unif[1, 4];
+z18 :~ unif[1, 4];
+z19 :~ unif[1, 4];
+observe(x = 2);
+return x;

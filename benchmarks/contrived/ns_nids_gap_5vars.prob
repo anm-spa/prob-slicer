@@ -1,0 +1,28 @@
+// @METADATA:name        = ns_nids_gap_5vars
+// @METADATA:description = NS vs NIDS gap: coin-based nontermination + 5 observe variables. NS keeps coin+while, NIDS may not.
+// @METADATA:reference   = generated/variant_distinction
+// @METADATA:criterion   = x
+// @METADATA:expected    = ns_size >= nids_size >= ni_size
+// @METADATA:tags        = generated variant_distinction ns_nids
+
+x :~ unif[1, 4];
+coin :~ unif[0, 1];
+y0 :~ unif[1, 4];
+observe(y0 = 2);
+y1 :~ unif[1, 4];
+observe(y1 = 2);
+y2 :~ unif[1, 4];
+observe(y2 = 2);
+y3 :~ unif[1, 4];
+observe(y3 = 2);
+y4 :~ unif[1, 4];
+observe(y4 = 2);
+if (coin = 1) then
+  while (true) do
+    skip;
+  end
+else
+  skip;
+end
+observe(x = 2);
+return x;

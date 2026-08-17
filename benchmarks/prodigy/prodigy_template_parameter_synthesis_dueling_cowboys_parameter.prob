@@ -1,0 +1,25 @@
+// @METADATA:name        = prodigy_template_parameter_synthesis_dueling_cowboys_parameter
+// @METADATA:description = Translated from Prodigy pGCL: template_parameter_synthesis/dueling_cowboys_parameter.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = t
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated template_parameter_synthesis
+
+while (c = 1 && t <= 1) do
+  if (t = 0) then
+    _coin :~ unif[0, 1];
+    if (_coin <= a) then
+      c := 0;
+    else
+      t := 1;
+    end
+  else
+    _coin :~ unif[0, 1];
+    if (_coin <= b) then
+      c := 0;
+    else
+      t := 0;
+    end
+  end
+end
+return t;

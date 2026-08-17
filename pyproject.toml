@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prob-slicer"
+version = "0.1.0"
+description = "Static dependence-based slicing for a probabilistic imperative language"
+requires-python = ">=3.10"
+dependencies = [
+    "networkx",
+]
+
+[project.optional-dependencies]
+# Needed for get_statistics.py, data_analysis.py, and test_slicer.py --save-xlsx
+analysis = [
+    "pandas",
+    "openpyxl",
+]
+# Only needed if regenerating parser.py from ProbLang.g4 with ANTLR
+grammar = [
+    "antlr4-python3-runtime",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

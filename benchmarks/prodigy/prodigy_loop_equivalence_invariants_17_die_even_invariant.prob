@@ -1,0 +1,22 @@
+// @METADATA:name        = prodigy_loop_equivalence_invariants_17_die_even_invariant
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/invariants/17_die_even_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = temp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+if (x < 6) then
+  temp :~ unif[0, 1];
+  x := 6;
+  c := c + temp + 1;
+  _coin :~ unif[0, 1];
+  if (_coin <= q) then
+    skip;
+  else
+    observe(false);
+  end
+  temp := 0;
+else
+  skip;
+end
+return temp;

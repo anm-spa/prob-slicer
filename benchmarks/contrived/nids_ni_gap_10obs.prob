@@ -1,0 +1,33 @@
+// @METADATA:name        = nids_ni_gap_10obs
+// @METADATA:description = NIDS vs NI gap: 10 observe statements + nonterminating while. NI removes y_i observes, NIDS keeps them.
+// @METADATA:reference   = generated/variant_distinction
+// @METADATA:criterion   = x
+// @METADATA:expected    = nids_size > ni_size
+// @METADATA:tags        = generated variant_distinction nids_ni
+
+x :~ unif[1, 4];
+y0 :~ unif[1, 4];
+observe(y0 = 2);
+y1 :~ unif[1, 4];
+observe(y1 = 2);
+y2 :~ unif[1, 4];
+observe(y2 = 2);
+y3 :~ unif[1, 4];
+observe(y3 = 2);
+y4 :~ unif[1, 4];
+observe(y4 = 2);
+y5 :~ unif[1, 4];
+observe(y5 = 2);
+y6 :~ unif[1, 4];
+observe(y6 = 2);
+y7 :~ unif[1, 4];
+observe(y7 = 2);
+y8 :~ unif[1, 4];
+observe(y8 = 2);
+y9 :~ unif[1, 4];
+observe(y9 = 2);
+while (x = 4) do
+  skip;
+end
+observe(x = 2);
+return x;

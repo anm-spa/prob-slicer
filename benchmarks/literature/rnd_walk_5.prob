@@ -1,0 +1,20 @@
+// @METADATA:name        = rnd_walk_5
+// @METADATA:description = Random walk with 5 steps
+// @METADATA:reference   = generated/rnd_walk
+// @METADATA:criterion   = x0
+// @METADATA:expected    = unknown
+// @METADATA:tags        = generated
+
+x0 :~ unif[1, 4];
+step1 :~ unif[0, 1];
+x1 := x0 + step1;
+step2 :~ unif[0, 1];
+x2 := x1 + step2;
+step3 :~ unif[0, 1];
+x3 := x2 + step3;
+step4 :~ unif[0, 1];
+x4 := x3 + step4;
+step5 :~ unif[0, 1];
+x5 := x4 + step5;
+observe(x5 > 2);
+return x0;

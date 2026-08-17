@@ -1,0 +1,14 @@
+// @METADATA:name        = prodigy_inference_loop_free_poor_scale
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/poor_scale.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = x
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+x :~ unif[0, 1];
+if (x > 1000) then
+  skip;
+else
+  x := 0;
+end
+return x;

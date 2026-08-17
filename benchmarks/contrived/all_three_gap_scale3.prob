@@ -1,0 +1,30 @@
+// @METADATA:name        = all_three_gap_scale3
+// @METADATA:description = All three variants differ (scale=3): NS > NIDS > NI expected. 3 observe vars, 6 irrelevant vars.
+// @METADATA:reference   = generated/variant_distinction
+// @METADATA:criterion   = x
+// @METADATA:expected    = ns_size > nids_size > ni_size
+// @METADATA:tags        = generated variant_distinction all_three
+
+x :~ unif[1, 4];
+coin :~ unif[0, 1];
+y0 :~ unif[1, 4];
+observe(y0 = 2);
+y1 :~ unif[1, 4];
+observe(y1 = 2);
+y2 :~ unif[1, 4];
+observe(y2 = 2);
+if (coin = 1) then
+  while (true) do
+    skip;
+  end
+else
+  skip;
+end
+z0 :~ unif[1, 4];
+z1 :~ unif[1, 4];
+z2 :~ unif[1, 4];
+z3 :~ unif[1, 4];
+z4 :~ unif[1, 4];
+z5 :~ unif[1, 4];
+observe(x = 2);
+return x;

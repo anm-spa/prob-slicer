@@ -1,0 +1,11 @@
+// @METADATA:name        = prodigy_loop_equivalence_skip_rejection_sampling
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/skip_rejection_sampling.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = c
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (c % 2 = 0) do
+  c :~ unif[0, 1];
+end
+return c;

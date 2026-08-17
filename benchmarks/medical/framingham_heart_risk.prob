@@ -1,0 +1,256 @@
+// @METADATA:name        = framingham_heart_risk
+// @METADATA:description = Coronary heart disease risk predictor (Framingham formula). Computes LDL and cholesterol risk points from patient data. Observes significant risk increase after measurement noise. All values scaled x10 for integer arithmetic.
+// @METADATA:reference   = Framingham Heart Study (http://www.framinghamheartstudy.org/risk/coronary.html); PSI probabilistic program
+// @METADATA:criterion   = tmp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = medical framingham real_world no_while
+
+// Coronary heart disease risk predictor (Framingham formula)
+// Translated from PSI/WebPPL version
+// All values scaled x10 for integer arithmetic
+// unifReal(a,b) -> unif[a*10, b*10]
+// Reference: http://www.framinghamheartstudy.org/risk/coronary.html
+
+// --- Primary risk factors ---
+age        :~ unif[300, 750];    // age in [30,75], scaled x10
+ldlc       :~ unif[700, 2400];   // LDL cholesterol, scaled x10
+bpSystolic :~ unif[1200, 1700];  // systolic BP, scaled x10
+
+// cholesterol and HDL depend on LDL level
+if (ldlc <= 1600) then
+  chol :~ unif[1300, 2400];
+  hdlc :~ unif[400, 750];
+else
+  chol :~ unif[2000, 3000];
+  hdlc :~ unif[200, 500];
+end
+
+// diastolic BP
+_bpDiastolicOffset :~ unif[400, 800];
+bpDiastolic := bpSystolic - _bpDiastolicOffset;
+
+// diabetes and smoking (scaled x100, threshold at 50)
+isDiabetic :~ unif[0, 100];
+isSmoker   :~ unif[0, 100];
+
+// --- Compute LDL points (scaled x10) ---
+// ldlPoints = 0.2*(age-35) - 1.0  (scaled: 2*(age-350)//10 - 10)
+ldlPoints := 2 * (age - 350) / 10 - 10;
+cholPoints := ldlPoints;
+
+// LDL cholesterol adjustment
+if (ldlc <= 1000) then
+  ldlPoints := ldlPoints - 30;
+else
+  if (ldlc <= 1600) then
+    ldlPoints := ldlPoints + 0;
+  else
+    if (ldlc <= 1900) then
+      ldlPoints := ldlPoints + 10;
+    else
+      ldlPoints := ldlPoints + 20;
+    end
+  end
+end
+
+// Total cholesterol adjustment
+if (chol <= 1600) then
+  cholPoints := cholPoints - 30;
+else
+  if (chol <= 2000) then
+    cholPoints := cholPoints + 0;
+  else
+    if (chol <= 2400) then
+      cholPoints := cholPoints + 10;
+    else
+      if (chol <= 2800) then
+        cholPoints := cholPoints + 20;
+      else
+        cholPoints := cholPoints + 30;
+      end
+    end
+  end
+end
+
+// HDL adjustment
+if (hdlc <= 350) then
+  ldlPoints  := ldlPoints  + 20;
+  cholPoints := cholPoints + 20;
+else
+  if (hdlc <= 450) then
+    ldlPoints  := ldlPoints  + 10;
+    cholPoints := cholPoints + 10;
+  else
+    skip;
+  end
+end
+
+if (hdlc >= 600) then
+  cholPoints := cholPoints - 20;
+  ldlPoints  := ldlPoints  - 10;
+else
+  skip;
+end
+
+// BP systolic adjustment
+bpSystolicIncr := 0;
+if (bpSystolic >= 850) then  bpSystolicIncr := 10; else skip; end
+if (bpSystolic >= 900) then  bpSystolicIncr := 20; else skip; end
+if (bpSystolic >= 1000) then bpSystolicIncr := 30; else skip; end
+
+// BP diastolic adjustment
+bpDiastolicIncr := 0;
+if (bpDiastolic >= 1300) then bpDiastolicIncr := 10; else skip; end
+if (bpDiastolic >= 1400) then bpDiastolicIncr := 20; else skip; end
+if (bpDiastolic >= 1600) then bpDiastolicIncr := 20; else skip; end
+
+// Use larger BP increment
+if (bpSystolicIncr >= bpDiastolicIncr) then
+  ldlPoints  := ldlPoints  + bpSystolicIncr;
+  cholPoints := cholPoints + bpSystolicIncr;
+else
+  ldlPoints  := ldlPoints  + bpDiastolicIncr;
+  cholPoints := cholPoints + bpDiastolicIncr;
+end
+
+// Diabetes adjustment
+if (isDiabetic >= 50) then
+  ldlPoints  := ldlPoints  + 20;
+  cholPoints := cholPoints + 20;
+else
+  skip;
+end
+
+// Smoking adjustment
+if (isSmoker >= 50) then
+  ldlPoints  := ldlPoints  + 20;
+  cholPoints := cholPoints + 20;
+else
+  skip;
+end
+
+// Save original points
+ldlPointsOrig  := ldlPoints;
+cholPointsOrig := cholPoints;
+
+// --- Add measurement noise ---
+_ldlcNoise      :~ unif[-100, 100];
+_cholNoise      :~ unif[-200, 200];
+_hdlcNoise      :~ unif[-50,   50];
+_bpSysNoise     :~ unif[-200, 200];
+_bpDiaNoise     :~ unif[-100, 100];
+ldlc       := ldlc       + _ldlcNoise;
+chol       := chol       + _cholNoise;
+hdlc       := hdlc       + _hdlcNoise;
+bpSystolic := bpSystolic + _bpSysNoise;
+bpDiastolic := bpDiastolic + _bpDiaNoise;
+
+// Diabetes flip (5% chance)
+_flip0 :~ unif[0, 100];
+if (_flip0 <= 5) then
+  isDiabetic := 100 - isDiabetic;
+else
+  skip;
+end
+
+// Smoking flip (5% chance)
+_flip1 :~ unif[0, 100];
+if (_flip1 <= 5) then
+  isSmoker := 100 - isSmoker;
+else
+  skip;
+end
+
+// --- Recompute points after noise ---
+ldlPoints  := 2 * (age - 350) / 10 - 10;
+cholPoints := ldlPoints;
+
+if (ldlc <= 1000) then
+  ldlPoints := ldlPoints - 30;
+else
+  if (ldlc <= 1600) then
+    ldlPoints := ldlPoints + 0;
+  else
+    if (ldlc <= 1900) then
+      ldlPoints := ldlPoints + 10;
+    else
+      ldlPoints := ldlPoints + 20;
+    end
+  end
+end
+
+if (chol <= 1600) then
+  cholPoints := cholPoints - 30;
+else
+  if (chol <= 2000) then
+    cholPoints := cholPoints + 0;
+  else
+    if (chol <= 2400) then
+      cholPoints := cholPoints + 10;
+    else
+      if (chol <= 2800) then
+        cholPoints := cholPoints + 20;
+      else
+        cholPoints := cholPoints + 30;
+      end
+    end
+  end
+end
+
+if (hdlc <= 350) then
+  ldlPoints  := ldlPoints  + 20;
+  cholPoints := cholPoints + 20;
+else
+  if (hdlc <= 450) then
+    ldlPoints  := ldlPoints  + 10;
+    cholPoints := cholPoints + 10;
+  else
+    skip;
+  end
+end
+
+if (hdlc >= 600) then
+  cholPoints := cholPoints - 20;
+  ldlPoints  := ldlPoints  - 10;
+else
+  skip;
+end
+
+bpSystolicIncr := 0;
+if (bpSystolic >= 850)  then bpSystolicIncr := 10; else skip; end
+if (bpSystolic >= 900)  then bpSystolicIncr := 20; else skip; end
+if (bpSystolic >= 1000) then bpSystolicIncr := 30; else skip; end
+
+bpDiastolicIncr := 0;
+if (bpDiastolic >= 1300) then bpDiastolicIncr := 10; else skip; end
+if (bpDiastolic >= 1400) then bpDiastolicIncr := 20; else skip; end
+if (bpDiastolic >= 1600) then bpDiastolicIncr := 20; else skip; end
+
+if (bpSystolicIncr >= bpDiastolicIncr) then
+  ldlPoints  := ldlPoints  + bpSystolicIncr;
+  cholPoints := cholPoints + bpSystolicIncr;
+else
+  ldlPoints  := ldlPoints  + bpDiastolicIncr;
+  cholPoints := cholPoints + bpDiastolicIncr;
+end
+
+if (isDiabetic >= 50) then
+  ldlPoints  := ldlPoints  + 20;
+  cholPoints := cholPoints + 20;
+else
+  skip;
+end
+
+if (isSmoker >= 50) then
+  ldlPoints  := ldlPoints  + 20;
+  cholPoints := cholPoints + 20;
+else
+  skip;
+end
+
+// --- Query ---
+// Original: estimateProb(tmp >= 5.0) where tmp = ldlPoints - ldlPointsOrig
+// Translated: observe that the risk increase is significant (>= 50 scaled)
+tmp := ldlPoints - ldlPointsOrig;
+observe(tmp >= 50);
+return tmp;

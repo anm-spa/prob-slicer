@@ -1,0 +1,17 @@
+// @METADATA:name        = prodigy_loop_equivalence_invariants_dep_bern_invariant
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/invariants/dep_bern_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = tmp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+if (c > 0) then
+  tmp :~ unif[0, 1];
+  m := m + tmp;
+  n := n + ( c - tmp );
+  c := 0;
+  tmp := 0;
+else
+  skip;
+end
+return tmp;

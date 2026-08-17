@@ -1,0 +1,22 @@
+// @METADATA:name        = prodigy_evt_invariants_subdist_enter
+// @METADATA:description = Translated from Prodigy pGCL: evt_invariants/subdist_enter.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = x
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated evt_invariants
+
+_coin :~ unif[0, 1];
+if (_coin <= 1 / 2) then
+  x := 1;
+else
+  x := 3;
+end
+while (x > 2) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    skip;
+  else
+    x := x - 1;
+  end
+end
+return x;

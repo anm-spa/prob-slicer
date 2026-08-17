@@ -1,0 +1,123 @@
+// @METADATA:name        = prodigy_template_parameter_synthesis_invariants_brp_obs_parameter_invariant
+// @METADATA:description = Translated from Prodigy pGCL: template_parameter_synthesis/invariants/brp_obs_parameter_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = h
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated template_parameter_synthesis
+
+if (s > 0 && f < 5) then
+  if (s >= 10) then
+    h := s - 9;
+    t :~ unif[0, 1];
+    if (t = 0) then
+      skip;
+    else
+      observe(false);
+    end
+    s := 9;
+    f := 0;
+  else
+    skip;
+  end
+  h := 5 - f;
+  t :~ unif[0, 1];
+  if (t > 0) then
+    f := 0;
+    s := s - 1;
+    if (s = 8) then
+      _coin :~ unif[0, 1];
+      if (_coin <= p) then
+        f := 5;
+      else
+        f := 0;
+        s := s - 1;
+      end
+    else
+      skip;
+    end
+    if (s = 7) then
+      _coin :~ unif[0, 1];
+      if (_coin <= p) then
+        f := 5;
+      else
+        f := 0;
+        s := s - 1;
+      end
+    else
+      skip;
+    end
+    if (s = 6) then
+      _coin :~ unif[0, 1];
+      if (_coin <= p) then
+        f := 5;
+      else
+        f := 0;
+        s := s - 1;
+      end
+    else
+      skip;
+    end
+    if (s = 5) then
+      _coin :~ unif[0, 1];
+      if (_coin <= p) then
+        f := 5;
+      else
+        f := 0;
+        s := s - 1;
+      end
+    else
+      skip;
+    end
+    if (s = 4) then
+      _coin :~ unif[0, 1];
+      if (_coin <= p) then
+        f := 5;
+      else
+        f := 0;
+        s := s - 1;
+      end
+    else
+      skip;
+    end
+    if (s = 3) then
+      _coin :~ unif[0, 1];
+      if (_coin <= p) then
+        f := 5;
+      else
+        f := 0;
+        s := s - 1;
+      end
+    else
+      skip;
+    end
+    if (s = 2) then
+      _coin :~ unif[0, 1];
+      if (_coin <= p) then
+        f := 5;
+      else
+        f := 0;
+        s := s - 1;
+      end
+    else
+      skip;
+    end
+    if (s = 1) then
+      _coin :~ unif[0, 1];
+      if (_coin <= p) then
+        f := 5;
+      else
+        f := 0;
+        s := s - 1;
+      end
+    else
+      skip;
+    end
+  else
+    f := 5;
+  end
+  t := 0;
+  h := 0;
+else
+  skip;
+end
+return h;

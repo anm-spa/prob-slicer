@@ -1,0 +1,15 @@
+// @METADATA:name        = prodigy_inference_loopy_conditioning_trivial_iid
+// @METADATA:description = Translated from Prodigy pGCL: inference/loopy/conditioning/trivial_iid.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = n
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+while (0 < n) do
+  tmp :~ unif[1, 6];
+  m := m + tmp;
+  tmp := 0;
+  n := n - 1;
+end
+observe(m * m * m < 1500);
+return n;

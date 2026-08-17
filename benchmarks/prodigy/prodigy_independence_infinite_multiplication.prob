@@ -1,0 +1,12 @@
+// @METADATA:name        = prodigy_independence_infinite_multiplication
+// @METADATA:description = Translated from Prodigy pGCL: independence/infinite_multiplication.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = s
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated independence
+
+x :~ unif[0, 1];
+y :~ unif[0, 1];
+z :~ unif[1, 3];
+s := x * y;
+return s;

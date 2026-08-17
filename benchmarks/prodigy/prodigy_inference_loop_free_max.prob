@@ -1,0 +1,19 @@
+// @METADATA:name        = prodigy_inference_loop_free_max
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/max.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = b
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+max := ;
+if (x > y) then
+  res := x;
+else
+  res := y;
+end
+a :~ unif[0, 1];
+b :~ unif[0, 1];
+r := max ( a , b );
+a := 0;
+b := 0;
+return b;

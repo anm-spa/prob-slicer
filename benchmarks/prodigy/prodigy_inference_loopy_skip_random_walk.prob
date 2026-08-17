@@ -1,0 +1,19 @@
+// @METADATA:name        = prodigy_inference_loopy_skip_random_walk
+// @METADATA:description = Translated from Prodigy pGCL: inference/loopy/skip_random_walk.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = c
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+x := 1;
+c := 0;
+while (1 <= x) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    x := x - 1;
+  else
+    x := x + 1;
+  end
+  c := c + 1;
+end
+return c;

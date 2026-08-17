@@ -1,0 +1,10 @@
+// @METADATA:name        = prodigy_comparison_psicomparison_psi_fails_parameters
+// @METADATA:description = Translated from Prodigy pGCL: comparison/psicomparison/psi_fails/parameters.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = n
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated comparison
+
+n :~ unif[0, 1];
+observe(n > 5);
+return n;

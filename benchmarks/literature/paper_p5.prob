@@ -1,0 +1,38 @@
+// @METADATA:name        = paper_p5
+// @METADATA:description = Program P5 from Figure 8 of the paper.
+//                         Illustrates observe-nontermination dependence
+//                         inside a conditional branch.
+//                         When y>=3: observe(y=4) conditions on y.
+//                         When y<3:  while(true) diverges — nonterminating
+//                         loop on the else branch.
+//                         The if-predicate (line 3) controls whether we
+//                         observe or diverge. Under ns, the if-predicate
+//                         is scd-dependent on return x (nonterminating
+//                         path never reaches return). Under nids/ni,
+//                         the if-predicate may not be wcd-dependent on
+//                         return x since return post-dominates if under
+//                         the termination assumption.
+// @METADATA:reference   = Masud and Olmedo (2026) Static Nontermination-
+//                         (In)Sensitive Slicing of Probabilistic Programs.
+//                         Figure 8, Program P5.
+// @METADATA:criterion   = x
+// @METADATA:expected    = ns: entire program in slice (if-predicate scd
+//                         on return; observe and while both kept);
+//                         nids: observe kept; while(true) and if may be
+//                         sliced since y not in data dep of x;
+//                         ni: most aggressive; observe may be sliced if
+//                         y independent of x
+// @METADATA:tags        = observe, nontermination, conditional, obsntd,
+//                         paper-example, figure-8, ns-vs-nids-vs-ni,
+//                         key-example
+
+x :~ unif[1, 4];
+y :~ unif[1, 4];
+if y >= 3 then
+    observe(y = 4);
+else
+    while true do
+        skip;
+    end
+end
+return x;

@@ -1,0 +1,30 @@
+// @METADATA:name        = prodigy_inference_loop_free_conditioning_grass
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/grass.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = wetGrass
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+cloudy :~ unif[0, 1];
+if (cloudy = 1) then
+  rain :~ unif[0, 1];
+  sprinkler :~ unif[0, 1];
+else
+  rain :~ unif[0, 1];
+  sprinkler :~ unif[0, 1];
+end
+temp1 :~ unif[0, 1];
+if (temp1 = 1 && rain = 1) then
+  wetRoof := 1;
+else
+  skip;
+end
+temp2 :~ unif[0, 1];
+temp3 :~ unif[0, 1];
+if (( temp2 = 1 && rain = 1 ) || ( temp3 = 1 && sprinkler = 1 )) then
+  wetGrass := 1;
+else
+  wetGrass := 0;
+end
+observe(wetGrass = 1);
+return wetGrass;

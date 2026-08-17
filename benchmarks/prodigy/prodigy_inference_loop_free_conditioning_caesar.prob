@@ -1,0 +1,23 @@
+// @METADATA:name        = prodigy_inference_loop_free_conditioning_caesar
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/caesar.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = fail
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+key :~ unif[0, 5];
+randomChar :~ unif[0, 5];
+cipher := ( randomChar + key );
+if (5 < cipher) then
+  cipher := cipher - 5;
+else
+  skip;
+end
+fail :~ unif[0, 1];
+if (fail = 1) then
+  skip;
+else
+  observe(cipher = 4);
+  skip;
+end
+return fail;

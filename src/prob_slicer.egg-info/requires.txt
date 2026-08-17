@@ -1,0 +1,8 @@
+networkx
+
+[analysis]
+pandas
+openpyxl
+
+[grammar]
+antlr4-python3-runtime

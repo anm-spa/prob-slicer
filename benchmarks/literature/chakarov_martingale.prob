@@ -1,0 +1,23 @@
+// @METADATA:name        = chakarov_martingale
+// @METADATA:description = Martingale-based termination example from Chakarov
+//                         and Sankaranarayanan (2013) Figure 1. Loop with
+//                         probabilistic decrement — terminates with prob 1
+//                         via ranking supermartingale argument.
+// @METADATA:reference   = Chakarov and Sankaranarayanan (2013) Probabilistic
+//                         Program Analysis with Martingales. CAV 2013
+// @METADATA:criterion   = x
+// @METADATA:expected    = last_coin sliced out; coin kept via data dep on x;
+//                         loop kept by ns; may be sliced by nids
+// @METADATA:tags        = loop, nontermination, martingale, termination
+
+x := 10;
+while x > 0 do
+    coin :~ bernoulli(0.5);
+    if coin = 1 then
+        x := x - 1;
+    else
+        x := x + 1;
+    end
+end
+last_coin := coin;
+return x;

@@ -1,0 +1,59 @@
+// @METADATA:name        = trueskill_10_2_10
+// @METADATA:description = TrueSkill tournament: 10 teams, 2 players/team, 10 matches
+// @METADATA:reference   = Herbrich et al., TrueSkill (NeurIPS 2006)
+// @METADATA:criterion   = s_1_1
+// @METADATA:expected    = unknown
+// @METADATA:tags        = generated probabilistic
+
+// TrueSkill tournament: 10 teams, 2 players, 10 matches
+
+// --- Player skills ---
+s_1_1 :~ unif[0, 10];
+s_2_1 :~ unif[0, 10];
+s_3_1 :~ unif[0, 10];
+s_3_2 :~ unif[0, 10];
+s_4_1 :~ unif[0, 10];
+s_5_1 :~ unif[0, 10];
+s_6_1 :~ unif[0, 10];
+s_7_1 :~ unif[0, 10];
+s_8_1 :~ unif[0, 10];
+s_9_1 :~ unif[0, 10];
+s_9_2 :~ unif[0, 10];
+s_10_1 :~ unif[0, 10];
+
+// --- Team performances ---
+perf_1 := s_1_1;
+perf_2 := s_2_1;
+perf_3 := s_3_1 + s_3_2;
+perf_4 := s_4_1;
+perf_5 := s_5_1;
+perf_6 := s_6_1;
+perf_7 := s_7_1;
+perf_8 := s_8_1;
+perf_9 := s_9_1 + s_9_2;
+perf_10 := s_10_1;
+
+// --- Match observations ---
+noise_0 :~ unif[0, 1];
+observe(perf_3 + noise_0 > perf_1);
+noise_1 :~ unif[0, 1];
+observe(perf_1 + noise_1 > perf_7);
+noise_2 :~ unif[0, 1];
+observe(perf_7 + noise_2 > perf_2);
+noise_3 :~ unif[0, 1];
+observe(perf_8 + noise_3 > perf_2);
+noise_4 :~ unif[0, 1];
+observe(perf_5 + noise_4 > perf_8);
+noise_5 :~ unif[0, 1];
+observe(perf_6 + noise_5 > perf_10);
+noise_6 :~ unif[0, 1];
+observe(perf_10 + noise_6 > perf_9);
+noise_7 :~ unif[0, 1];
+observe(perf_7 + noise_7 > perf_6);
+noise_8 :~ unif[0, 1];
+observe(perf_6 + noise_8 > perf_2);
+noise_9 :~ unif[0, 1];
+observe(perf_5 + noise_9 > perf_10);
+
+// --- Query: skill of player 1 on team 1 ---
+return s_1_1;

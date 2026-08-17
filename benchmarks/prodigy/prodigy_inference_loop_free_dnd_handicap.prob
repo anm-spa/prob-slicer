@@ -1,0 +1,23 @@
+// @METADATA:name        = prodigy_inference_loop_free_dnd_handicap
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/dnd_handicap.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = m
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+m :~ unif[1, 6];
+x :~ unif[1, 6];
+if (good = 1) then
+  if (x > m) then
+    m := x;
+  else
+    skip;
+  end
+else
+  if (x < m) then
+    m := x;
+  else
+    skip;
+  end
+end
+return m;

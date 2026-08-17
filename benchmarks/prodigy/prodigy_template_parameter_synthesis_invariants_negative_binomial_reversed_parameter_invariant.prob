@@ -1,0 +1,16 @@
+// @METADATA:name        = prodigy_template_parameter_synthesis_invariants_negative_binomial_reversed_parameter_invariant
+// @METADATA:description = Translated from Prodigy pGCL: template_parameter_synthesis/invariants/negative_binomial_reversed_parameter_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = temp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated template_parameter_synthesis
+
+if (0 < n) then
+  temp :~ unif[0, 1];
+  i := i + temp;
+  n := 0;
+  temp := 0;
+else
+  skip;
+end
+return temp;

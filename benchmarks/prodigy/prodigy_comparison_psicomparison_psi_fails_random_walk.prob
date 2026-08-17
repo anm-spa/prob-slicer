@@ -1,0 +1,18 @@
+// @METADATA:name        = prodigy_comparison_psicomparison_psi_fails_random_walk
+// @METADATA:description = Translated from Prodigy pGCL: comparison/psicomparison/psi_fails/random_walk.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = tmp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated comparison
+
+while (s > 0) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    s := s + 1;
+  else
+    s := s - 1;
+  end
+  c := c + 1;
+  tmp := 0;
+end
+return tmp;

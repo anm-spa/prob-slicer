@@ -1,0 +1,17 @@
+// @METADATA:name        = hmm_2
+// @METADATA:description = HMM with 2 time steps
+// @METADATA:reference   = generated/hmm
+// @METADATA:criterion   = x0
+// @METADATA:expected    = unknown
+// @METADATA:tags        = generated
+
+x0 :~ unif[1, 4];
+noise1 :~ unif[0, 1];
+x1 := x0 + noise1;
+y1 :~ unif[1, 4];
+observe(y1 = x1);
+noise2 :~ unif[0, 1];
+x2 := x1 + noise2;
+y2 :~ unif[1, 4];
+observe(y2 = x2);
+return x2;

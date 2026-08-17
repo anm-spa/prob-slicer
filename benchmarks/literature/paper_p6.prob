@@ -1,0 +1,43 @@
+// @METADATA:name        = paper_p6
+// @METADATA:description = Program P6 from Figure 8 of the paper.
+//                         Illustrates observe-nontermination dependence
+//                         with a nonterminating loop inside a conditional
+//                         and an observe after the conditional.
+//                         When x>=4: while(y=4) may not terminate.
+//                         When x<4:  skip.
+//                         After the conditional: observe(y>2) conditions
+//                         on y. Under ns, the while predicate is an
+//                         obsntd_nt source and generates obsntd edges.
+//                         The if-predicate (x>=4) is scd-dependent on
+//                         observe(y>2) since nonterminating path never
+//                         reaches the observe. Under nids, wcd may not
+//                         add this dependency. Under ni, only the observe
+//                         is a source.
+// @METADATA:reference   = Masud and Olmedo (2026) Static Nontermination-
+//                         (In)Sensitive Slicing of Probabilistic Programs.
+//                         Figure 8, Program P6.
+// @METADATA:criterion   = x
+// @METADATA:expected    = ns: x kept via return; if-predicate kept via
+//                         scd on observe (nonterminating path never
+//                         reaches observe); while kept via obsntd_nt;
+//                         y kept via observe(y>2) and while guard;
+//                         nids: observe(y>2) kept; if-predicate may be
+//                         sliced (wcd does not add scd-only deps);
+//                         while may be sliced; y kept via observe;
+//                         ni: observe(y>2) kept as source; nonterminating
+//                         while NOT a source; most aggressive slice
+// @METADATA:tags        = observe, nontermination, conditional, obsntd,
+//                         paper-example, figure-8, ns-vs-nids-vs-ni,
+//                         key-example
+
+x :~ unif[1, 4];
+y :~ unif[1, 4];
+if x >= 4 then
+    while y = 4 do
+        skip;
+    end
+else
+    skip;
+end
+observe(y > 2);
+return x;

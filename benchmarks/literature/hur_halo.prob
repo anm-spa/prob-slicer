@@ -1,0 +1,48 @@
+// @METADATA:name        = hur_halo
+// @METADATA:description = Halo skill rating from Hur et al. (2014) Table 1.
+//                         TrueSkill-style team model. Original: 31 teams up
+//                         to 4 players per team. Scaled to 3 teams 2 players.
+//                         Criterion: skills of 4 particular players (team 1
+//                         and team 2). Team 3 is irrelevant.
+// @METADATA:reference   = Hur Nori Rajamani Samuel (2014) Slicing
+//                         Probabilistic Programs. PLDI 2014.
+//                         TrueSkill: Dangauthier et al. (2007) NIPS
+// @METADATA:criterion   = skill_t1p1
+// @METADATA:expected    = team3 subtree sliced out; matches involving only
+//                         team3 partially sliced; team1 and team2 kept
+// @METADATA:tags        = trueskill, team-model, evaluation-benchmark,
+//                         hur-pldi14, skill-rating, r-slicing
+
+skill_t1p1  :~ unif[0, 10];
+skill_t1p2  :~ unif[0, 10];
+team1_skill := skill_t1p1 + skill_t1p2;
+skill_t2p1  :~ unif[0, 10];
+skill_t2p2  :~ unif[0, 10];
+team2_skill := skill_t2p1 + skill_t2p2;
+skill_t3p1  :~ unif[0, 10];
+skill_t3p2  :~ unif[0, 10];
+team3_skill := skill_t3p1 + skill_t3p2;
+noise       :~ unif[-3, 3];
+diff_m1     := team1_skill - team2_skill + noise;
+if diff_m1 > 0 then
+    result_m1 := 1;
+else
+    result_m1 := 0;
+end
+observe(result_m1 = 1);
+diff_m2 := team1_skill - team3_skill + noise;
+if diff_m2 > 0 then
+    result_m2 := 1;
+else
+    result_m2 := 0;
+end
+observe(result_m2 = 1);
+diff_m3 := team2_skill - team3_skill + noise;
+if diff_m3 > 0 then
+    result_m3 := 1;
+else
+    result_m3 := 0;
+end
+observe(result_m3 = 0);
+irrelevant := team3_skill + 1;
+return skill_t1p1;

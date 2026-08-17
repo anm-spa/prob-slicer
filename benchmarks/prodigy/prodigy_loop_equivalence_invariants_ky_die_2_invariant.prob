@@ -1,0 +1,39 @@
+// @METADATA:name        = prodigy_loop_equivalence_invariants_ky_die_2_invariant
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/invariants/ky_die_2_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = die
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+if (s = 0) then
+  s := 3;
+  die :~ unif[1, 3];
+else
+  if (s = 1) then
+    s := 3;
+    _coin :~ unif[0, 1];
+    if (_coin <= 2 / 3) then
+      die := 1;
+    else
+      _coin :~ unif[0, 1];
+      if (_coin <= 1 / 2) then
+        die := 2;
+      else
+        die := 3;
+      end
+    end
+  else
+    if (s = 2) then
+      s := 3;
+      _coin :~ unif[0, 1];
+      if (_coin <= 1 / 2) then
+        die := 2;
+      else
+        die := 3;
+      end
+    else
+      skip;
+    end
+  end
+end
+return die;

@@ -1,0 +1,31 @@
+// @METADATA:name        = prodigy_inference_loopy_uniform_sampling
+// @METADATA:description = Translated from Prodigy pGCL: inference/loopy/uniform_sampling.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = v
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+running := 1;
+v := 12;
+c := 11;
+while (running = 1) do
+  v := 2 * v;
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    c := 2 * c + 1;
+  else
+    c := 2 * c;
+  end
+  if (v >= 12) then
+    if (12 > c) then
+      running := 0;
+    else
+      v := v - 12;
+      c := c - 12;
+    end
+  else
+    skip;
+  end
+end
+v := 0;
+return v;

@@ -1,0 +1,16 @@
+// @METADATA:name        = prodigy_loop_equivalence_invariants_n_geometric_invariant
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/invariants/n_geometric_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = tmp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+if (n > 0) then
+  tmp :~ unif[0, 1];
+  c := c + tmp;
+  n := 0;
+  tmp := 0;
+else
+  skip;
+end
+return tmp;

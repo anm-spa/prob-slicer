@@ -1,0 +1,24 @@
+// @METADATA:name        = gordon_hmm
+// @METADATA:description = Two-step Hidden Markov Model from Gordon et al.
+//                         (2014) Section 4. Infer hidden state from two
+//                         observations. Standard benchmark for probabilistic
+//                         inference algorithms.
+// @METADATA:reference   = Gordon Henzinger Nori Rajamani (2014) Probabilistic
+//                         Programming. FOSE 2014
+// @METADATA:criterion   = state1
+// @METADATA:expected    = t sliced out; state0 kept via transition dep;
+//                         emit0 and emit1 kept via observe dependence
+// @METADATA:tags        = hmm, bayesian, observe, chain, sequential
+
+state0 :~ bernoulli(0.5);
+emit0  :~ bernoulli(0.8);
+observe(emit0 = state0);
+if state0 = 1 then
+    state1 :~ bernoulli(0.9);
+else
+    state1 :~ bernoulli(0.1);
+end
+emit1 :~ bernoulli(0.8);
+observe(emit1 = state1);
+t := 1;
+return state1;

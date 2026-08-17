@@ -1,0 +1,42 @@
+// @METADATA:name        = hur_burglar_alarm
+// @METADATA:description = Burglar alarm Bayesian network from Hur et al.
+//                         (2014) Table 1. Classic five-node BN from AIMA:
+//                         Burglary Earthquake -> Alarm -> JohnCalls MaryCalls.
+//                         Observed: Alarm=true. Criterion: JohnCalls.
+// @METADATA:reference   = Hur Nori Rajamani Samuel (2014) Slicing
+//                         Probabilistic Programs. PLDI 2014.
+//                         Original BN: Russell and Norvig (2010) AIMA Ch.14
+// @METADATA:criterion   = john
+// @METADATA:expected    = mary and irrelevant sliced out; burglary earthquake
+//                         alarm all kept via data dep; observe kept
+// @METADATA:tags        = bayesian-network, observe, hur-pldi14, aima,
+//                         evaluation-benchmark
+
+burglary   :~ bernoulli(1);
+earthquake :~ bernoulli(1);
+if burglary = 1 then
+    if earthquake = 1 then
+        alarm :~ bernoulli(95);
+    else
+        alarm :~ bernoulli(94);
+    end
+else
+    if earthquake = 1 then
+        alarm :~ bernoulli(29);
+    else
+        alarm :~ bernoulli(1);
+    end
+end
+observe(alarm = 1);
+if alarm = 1 then
+    john :~ bernoulli(90);
+else
+    john :~ bernoulli(5);
+end
+if alarm = 1 then
+    mary :~ bernoulli(70);
+else
+    mary :~ bernoulli(1);
+end
+irrelevant := mary + 1;
+return john;

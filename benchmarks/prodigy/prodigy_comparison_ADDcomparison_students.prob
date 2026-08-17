@@ -1,0 +1,104 @@
+// @METADATA:name        = prodigy_comparison_ADDcomparison_students
+// @METADATA:description = Translated from Prodigy pGCL: comparison/ADDcomparison/students.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = _coin
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated comparison
+
+likes_11 :~ unif[0, 1];
+likes_12 :~ unif[0, 1];
+likes_21 :~ unif[0, 1];
+likes_22 :~ unif[0, 1];
+likes_31 :~ unif[0, 1];
+likes_32 :~ unif[0, 1];
+likes_41 :~ unif[0, 1];
+likes_42 :~ unif[0, 1];
+sInC_11 := 1;
+sInC_12 := 0;
+sInC_21 := 1;
+sInC_22 := 1;
+sInC_31 := 0;
+sInC_32 := 1;
+sInC_41 := 0;
+sInC_42 := 0;
+_coin :~ unif[0, 1];
+if (_coin <= 7 / 10) then
+  if (sInC_11 = 1) then
+    observe(likes_11 = 1);
+  else
+    skip;
+  end
+else
+  skip;
+end
+_coin :~ unif[0, 1];
+if (_coin <= 7 / 10) then
+  if (sInC_12 = 1) then
+    observe(likes_12 = 1);
+  else
+    skip;
+  end
+else
+  skip;
+end
+_coin :~ unif[0, 1];
+if (_coin <= 7 / 10) then
+  if (sInC_21 = 1) then
+    observe(likes_21 = 1);
+  else
+    skip;
+  end
+else
+  skip;
+end
+_coin :~ unif[0, 1];
+if (_coin <= 7 / 10) then
+  if (sInC_22 = 1) then
+    observe(likes_22 = 1);
+  else
+    skip;
+  end
+else
+  skip;
+end
+_coin :~ unif[0, 1];
+if (_coin <= 7 / 10) then
+  if (sInC_31 = 1) then
+    observe(likes_31 = 1);
+  else
+    skip;
+  end
+else
+  skip;
+end
+_coin :~ unif[0, 1];
+if (_coin <= 7 / 10) then
+  if (sInC_32 = 1) then
+    observe(likes_32 = 1);
+  else
+    skip;
+  end
+else
+  skip;
+end
+_coin :~ unif[0, 1];
+if (_coin <= 7 / 10) then
+  if (sInC_41 = 1) then
+    observe(likes_41 = 1);
+  else
+    skip;
+  end
+else
+  skip;
+end
+_coin :~ unif[0, 1];
+if (_coin <= 7 / 10) then
+  if (sInC_42 = 1) then
+    observe(likes_42 = 1);
+  else
+    skip;
+  end
+else
+  skip;
+end
+return _coin;

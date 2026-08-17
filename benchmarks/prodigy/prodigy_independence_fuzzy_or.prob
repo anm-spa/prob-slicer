@@ -1,0 +1,44 @@
+// @METADATA:name        = prodigy_independence_fuzzy_or
+// @METADATA:description = Translated from Prodigy pGCL: independence/fuzzy_or.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = n3
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated independence
+
+n0 :~ unif[0, 1];
+n4 :~ unif[0, 1];
+if (n0 = 1) then
+  n1 :~ unif[0, 1];
+  n21 :~ unif[0, 1];
+else
+  n1 :~ unif[0, 1];
+  n21 :~ unif[0, 1];
+end
+if (n4 = 1) then
+  n22 :~ unif[0, 1];
+  n33 :~ unif[0, 1];
+else
+  n22 :~ unif[0, 1];
+  n33 :~ unif[0, 1];
+end
+if (n21 = 1 || n22 = 1) then
+  n2 := 1;
+else
+  skip;
+end
+if (n1 = 1) then
+  n31 :~ unif[0, 1];
+else
+  n31 :~ unif[0, 1];
+end
+if (n2 = 1) then
+  n32 :~ unif[0, 1];
+else
+  n32 :~ unif[0, 1];
+end
+if (n31 = 1 || n32 = 1 || n33 = 1) then
+  n3 := 1;
+else
+  skip;
+end
+return n3;

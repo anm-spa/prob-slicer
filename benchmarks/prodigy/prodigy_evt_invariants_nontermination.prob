@@ -1,0 +1,17 @@
+// @METADATA:name        = prodigy_evt_invariants_nontermination
+// @METADATA:description = Translated from Prodigy pGCL: evt_invariants/nontermination.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = x
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated evt_invariants
+
+_coin :~ unif[0, 1];
+if (_coin <= 1 / 2) then
+  x := 1;
+else
+  x := 2;
+end
+while (x = 1) do
+  skip;
+end
+return x;

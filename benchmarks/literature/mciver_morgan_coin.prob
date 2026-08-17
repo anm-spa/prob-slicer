@@ -1,0 +1,20 @@
+// @METADATA:name        = mciver_morgan_coin
+// @METADATA:description = Fair coin from biased coin (Von Neumann trick) from
+//                         McIver and Morgan (2005) Chapter 8. Simulates a fair
+//                         coin using a biased one via rejection sampling loop.
+// @METADATA:reference   = McIver and Morgan (2005) Abstraction Refinement and
+//                         Proof for Probabilistic Systems. Springer Monographs
+//                         in Computer Science
+// @METADATA:criterion   = flip1
+// @METADATA:expected    = dummy sliced out; flip2 kept inside loop via control
+//                         dep; loop kept by ns; nids may slice loop
+// @METADATA:tags        = loop, nontermination, rejection-sampling, fairness
+
+flip1 :~ bernoulli(0.3);
+flip2 :~ bernoulli(0.3);
+while flip1 = flip2 do
+    flip1 :~ bernoulli(0.3);
+    flip2 :~ bernoulli(0.3);
+end
+dummy := flip2;
+return flip1;

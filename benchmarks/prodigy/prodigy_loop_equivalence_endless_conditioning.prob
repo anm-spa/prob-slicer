@@ -1,0 +1,17 @@
+// @METADATA:name        = prodigy_loop_equivalence_endless_conditioning
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/endless_conditioning.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = x
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (x = 1) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    x := 0;
+  else
+    x := 1;
+  end
+  observe(x = 1);
+end
+return x;

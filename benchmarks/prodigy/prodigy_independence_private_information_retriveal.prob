@@ -1,0 +1,48 @@
+// @METADATA:name        = prodigy_independence_private_information_retriveal
+// @METADATA:description = Translated from Prodigy pGCL: independence/private_information_retriveal.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = v
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated independence
+
+I0 := 1;
+q00 :~ unif[0, 1];
+q01 :~ unif[0, 1];
+q02 :~ unif[0, 1];
+q10 := ( q00 + I0 ) % 2;
+q11 := ( q01 + I1 ) % 2;
+q12 := ( q02 + I2 ) % 2;
+if (q00 = 1) then
+  a00 := D0;
+else
+  skip;
+end
+if (q10 = 1) then
+  a10 := D0;
+else
+  skip;
+end
+if (q01 = 1) then
+  a01 := D1;
+else
+  skip;
+end
+if (q11 = 1) then
+  a11 := D1;
+else
+  skip;
+end
+if (q02 = 1) then
+  a02 := D2;
+else
+  skip;
+end
+if (q12 = 1) then
+  a12 := D2;
+else
+  skip;
+end
+r0 := ( a00 + a01 + a02 ) % 2;
+r1 := ( a10 + a11 + a12 ) % 2;
+v := r0 * r1;
+return v;

@@ -1,0 +1,14 @@
+// @METADATA:name        = prodigy_loop_equivalence_17_die_even
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/17_die_even.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = temp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (x < 6) do
+  x :~ unif[1, 6];
+  c := c + 1;
+  observe(x % 2 = 0);
+  temp := 0;
+end
+return temp;

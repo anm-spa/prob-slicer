@@ -1,0 +1,36 @@
+// @METADATA:name        = prodigy_independence_oblivious_transfer
+// @METADATA:description = Translated from Prodigy pGCL: independence/oblivious_transfer.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = f1c
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated independence
+
+c := 0;
+m0 := 1;
+m1 := 2;
+r0 :~ unif[0, 7];
+r1 :~ unif[0, 7];
+d :~ unif[0, 1];
+if (d = 0) then
+  rd := r0;
+  r1d := r1;
+else
+  rd := r1;
+  r1d := r0;
+end
+e := ( c + d ) % 2;
+if (e = 0) then
+  f0 := m0 + r0;
+  f1 := m1 + r1;
+else
+  f0 := m0 + r1;
+  f1 := m1 + r0;
+end
+if (c = 0) then
+  mc := f0 + rd;
+  f1c := m1 + r1d;
+else
+  mc := f1 + rd;
+  f1c := m0 + r1d;
+end
+return f1c;

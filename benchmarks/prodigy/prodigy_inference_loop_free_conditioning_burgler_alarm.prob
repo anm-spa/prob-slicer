@@ -1,0 +1,35 @@
+// @METADATA:name        = prodigy_inference_loop_free_conditioning_burgler_alarm
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/burgler_alarm.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = called
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+earthquake :~ unif[0, 1];
+burglary :~ unif[0, 1];
+if (earthquake = 1 || burglary = 1) then
+  alarm := 1;
+else
+  skip;
+end
+if (earthquake = 1) then
+  phoneWorking :~ unif[0, 1];
+else
+  phoneWorking :~ unif[0, 1];
+end
+if (alarm = 1) then
+  if (earthquake = 1) then
+    maryWakes :~ unif[0, 1];
+  else
+    maryWakes :~ unif[0, 1];
+  end
+else
+  maryWakes :~ unif[0, 1];
+end
+if (maryWakes = 1 && phoneWorking = 1) then
+  called := 1;
+else
+  skip;
+end
+observe(called = 1);
+return called;

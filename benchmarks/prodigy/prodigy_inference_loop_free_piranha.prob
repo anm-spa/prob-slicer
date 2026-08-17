@@ -1,0 +1,15 @@
+// @METADATA:name        = prodigy_inference_loop_free_piranha
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/piranha.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = fish_taken_is_piranha
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+piranha :~ unif[0, 1];
+if (piranha = 1) then
+  fish_taken_is_piranha := 1;
+else
+  fish_taken_is_piranha :~ unif[0, 1];
+end
+observe(fish_taken_is_piranha = 1);
+return fish_taken_is_piranha;

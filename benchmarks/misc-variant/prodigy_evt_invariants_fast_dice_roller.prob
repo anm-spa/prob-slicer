@@ -1,0 +1,32 @@
+// @METADATA:name        = prodigy_evt_invariants_fast_dice_roller
+// @METADATA:description = Translated from Prodigy pGCL: evt_invariants/fast_dice_roller.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = v
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated evt_invariants
+
+v := 1;
+c := 0;
+flag := 0;
+while (flag = 0) do
+  v := 2 * v;
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    c := 2 * c;
+  else
+    c := 2 * c + 1;
+  end
+  if (6 <= v) then
+    if (c < 6) then
+      flag := 1;
+    else
+      v := v - 6;
+      c := c - 6;
+    end
+  else
+    skip;
+  end
+end
+flag := 0;
+v := 0;
+return v;

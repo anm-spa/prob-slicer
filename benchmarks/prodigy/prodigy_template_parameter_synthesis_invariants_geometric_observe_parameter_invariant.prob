@@ -1,0 +1,17 @@
+// @METADATA:name        = prodigy_template_parameter_synthesis_invariants_geometric_observe_parameter_invariant
+// @METADATA:description = Translated from Prodigy pGCL: template_parameter_synthesis/invariants/geometric_observe_parameter_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = tmp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated template_parameter_synthesis
+
+if (y = 1) then
+  tmp :~ unif[0, 1];
+  x := x + tmp;
+  y := 0;
+  observe(x < 3);
+  tmp := 0;
+else
+  skip;
+end
+return tmp;

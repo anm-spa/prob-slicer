@@ -1,0 +1,19 @@
+// @METADATA:name        = olmedo_nontermination
+// @METADATA:description = Nonterminating conditioning from Olmedo et al. (2018)
+//                         Section 5. Key example distinguishing nontermination-
+//                         sensitive (ns) and nontermination-insensitive (nids)
+//                         slicing. Loop diverges with positive probability 0.5.
+// @METADATA:reference   = Olmedo Gretz Jansen Kaminski Katoen McIver (2018)
+//                         Conditioning in Probabilistic Programming. TOPLAS
+// @METADATA:criterion   = x
+// @METADATA:expected    = z sliced by all; loop kept by ns; loop may be
+//                         sliced by nids; KEY ns vs nids distinguishing example
+// @METADATA:tags        = loop, nontermination, ns-vs-nids, key-example, observe
+
+x :~ bernoulli(0.5);
+while x = 1 do
+    x :~ bernoulli(0.5);
+end
+observe(x = 0);
+z := 99;
+return x;

@@ -1,0 +1,60 @@
+// @METADATA:name        = rnd_walk_25
+// @METADATA:description = Random walk with 25 steps
+// @METADATA:reference   = generated/rnd_walk
+// @METADATA:criterion   = x0
+// @METADATA:expected    = unknown
+// @METADATA:tags        = generated
+
+x0 :~ unif[1, 4];
+step1 :~ unif[0, 1];
+x1 := x0 + step1;
+step2 :~ unif[0, 1];
+x2 := x1 + step2;
+step3 :~ unif[0, 1];
+x3 := x2 + step3;
+step4 :~ unif[0, 1];
+x4 := x3 + step4;
+step5 :~ unif[0, 1];
+x5 := x4 + step5;
+step6 :~ unif[0, 1];
+x6 := x5 + step6;
+step7 :~ unif[0, 1];
+x7 := x6 + step7;
+step8 :~ unif[0, 1];
+x8 := x7 + step8;
+step9 :~ unif[0, 1];
+x9 := x8 + step9;
+step10 :~ unif[0, 1];
+x10 := x9 + step10;
+step11 :~ unif[0, 1];
+x11 := x10 + step11;
+step12 :~ unif[0, 1];
+x12 := x11 + step12;
+step13 :~ unif[0, 1];
+x13 := x12 + step13;
+step14 :~ unif[0, 1];
+x14 := x13 + step14;
+step15 :~ unif[0, 1];
+x15 := x14 + step15;
+step16 :~ unif[0, 1];
+x16 := x15 + step16;
+step17 :~ unif[0, 1];
+x17 := x16 + step17;
+step18 :~ unif[0, 1];
+x18 := x17 + step18;
+step19 :~ unif[0, 1];
+x19 := x18 + step19;
+step20 :~ unif[0, 1];
+x20 := x19 + step20;
+step21 :~ unif[0, 1];
+x21 := x20 + step21;
+step22 :~ unif[0, 1];
+x22 := x21 + step22;
+step23 :~ unif[0, 1];
+x23 := x22 + step23;
+step24 :~ unif[0, 1];
+x24 := x23 + step24;
+step25 :~ unif[0, 1];
+x25 := x24 + step25;
+observe(x25 > 2);
+return x0;

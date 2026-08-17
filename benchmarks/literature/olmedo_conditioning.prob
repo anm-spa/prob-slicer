@@ -1,0 +1,16 @@
+// @METADATA:name        = olmedo_conditioning
+// @METADATA:description = Conditioning example from Olmedo et al. (2018)
+//                         Section 2. Motivating example for observe semantics.
+//                         Posterior of x given observation on y.
+// @METADATA:reference   = Olmedo Gretz Jansen Kaminski Katoen McIver (2018)
+//                         Conditioning in Probabilistic Programming. TOPLAS
+// @METADATA:criterion   = x
+// @METADATA:expected    = aux sliced out; y kept via observe dependence;
+//                         observe node kept
+// @METADATA:tags        = observe, conditioning, basic, bayesian
+
+x   :~ bernoulli(0.5);
+y   :~ bernoulli(0.5);
+observe(y = x);
+aux := x + y;
+return x;

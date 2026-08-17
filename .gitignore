@@ -1,0 +1,27 @@
+# Python virtual environment
+mdu_pyenv/
+venv/
+.venv/
+
+# Python bytecode / cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS / editor artifacts
+.DS_Store
+~$*.xlsx
+~$*.xls
+*.swp
+
+# Generated slicer output (regenerate via run_all_benchmarks.py / test_slicer.py)
+dot_output/
+cleaned_benchmark_data.csv
+results/*.txt
+results/*.xlsx
+results/*.csv
+!results/.gitkeep
+
+# Old/large run logs (regenerate via test_slicer.py / run_all_benchmarks.py)
+*.log
+summary.txt

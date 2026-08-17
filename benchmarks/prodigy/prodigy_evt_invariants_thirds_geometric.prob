@@ -1,0 +1,22 @@
+// @METADATA:name        = prodigy_evt_invariants_thirds_geometric
+// @METADATA:description = Translated from Prodigy pGCL: evt_invariants/thirds_geometric.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = x
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated evt_invariants
+
+x := 1;
+while (x % 3 = 1) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 3) then
+    x := x + 1;
+  else
+    _coin :~ unif[0, 1];
+    if (_coin <= 1 / 2) then
+      x := x + 2;
+    else
+      x := x + 3;
+    end
+  end
+end
+return x;

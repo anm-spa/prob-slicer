@@ -1,0 +1,61 @@
+// @METADATA:name        = prodigy_independence_many_variables
+// @METADATA:description = Translated from Prodigy pGCL: independence/many_variables.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = n21
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated independence
+
+n0 :~ unif[0, 1];
+n4 :~ unif[0, 1];
+if (n0 = 1) then
+  n1 :~ unif[0, 1];
+  n21 :~ unif[0, 1];
+else
+  n1 :~ unif[0, 1];
+  n21 :~ unif[0, 1];
+end
+if (n4 = 1) then
+  n22 :~ unif[0, 1];
+  n33 :~ unif[0, 1];
+else
+  n22 :~ unif[0, 1];
+  n33 :~ unif[0, 1];
+end
+if (n21 = 1 || n22 = 1) then
+  n2 := 1;
+else
+  skip;
+end
+if (n1 = 1) then
+  n31 :~ unif[0, 1];
+else
+  n31 :~ unif[0, 1];
+end
+if (n2 = 1) then
+  n32 :~ unif[0, 1];
+else
+  n32 :~ unif[0, 1];
+end
+if (n31 = 1 || n32 = 1 || n33 = 1) then
+  n3 := 1;
+else
+  skip;
+end
+n61 := n31 + n3;
+n62 :~ unif[1, 7];
+n63 := n62;
+n64 := n63 + n62 + n61 + n4;
+n65 :~ unif[0, 1];
+n66 :~ unif[0, 1];
+if (n51 = n2) then
+  n67 := 1;
+else
+  n67 := 0;
+end
+n52 := n4 + 7;
+n61 := n52 + n66;
+n52 := n52 + n61 + n64;
+n63 := n22 * n33;
+n53 := n32 * n65;
+n21 := n63 + n61;
+return n21;

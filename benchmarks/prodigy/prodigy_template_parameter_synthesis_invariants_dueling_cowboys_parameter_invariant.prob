@@ -1,0 +1,19 @@
+// @METADATA:name        = prodigy_template_parameter_synthesis_invariants_dueling_cowboys_parameter_invariant
+// @METADATA:description = Translated from Prodigy pGCL: template_parameter_synthesis/invariants/dueling_cowboys_parameter_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = c
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated template_parameter_synthesis
+
+if (c = 1 && t <= 1) then
+  if (t = 0) then
+    t :~ unif[0, 1];
+    c := 0;
+  else
+    t :~ unif[0, 1];
+    c := 0;
+  end
+else
+  skip;
+end
+return c;

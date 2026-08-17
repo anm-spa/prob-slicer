@@ -1,0 +1,41 @@
+// @METADATA:name        = prodigy_loop_equivalence_ky_die_2
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/ky_die_2.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = die
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (s < 3) do
+  if (s = 0) then
+    _coin :~ unif[0, 1];
+    if (_coin <= 1 / 2) then
+      s := 1;
+    else
+      s := 2;
+    end
+  else
+    if (s = 1) then
+      _coin :~ unif[0, 1];
+      if (_coin <= 1 / 2) then
+        s := 0;
+      else
+        s := 3;
+        die := 1;
+      end
+    else
+      if (s = 2) then
+        _coin :~ unif[0, 1];
+        if (_coin <= 1 / 2) then
+          s := 3;
+          die := 2;
+        else
+          s := 3;
+          die := 3;
+        end
+      else
+        skip;
+      end
+    end
+  end
+end
+return die;

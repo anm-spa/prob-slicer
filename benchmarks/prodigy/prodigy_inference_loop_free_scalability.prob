@@ -1,0 +1,20 @@
+// @METADATA:name        = prodigy_inference_loop_free_scalability
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/scalability.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = x
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+x :~ unif[0, 1];
+if (x > 15) then
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    x := x + 1;
+  else
+    x := x - 1;
+  end
+else
+    skip;
+end
+skip;
+return x;

@@ -1,0 +1,15 @@
+// @METADATA:name        = prodigy_inference_loopy_skip_exceeding_sum
+// @METADATA:description = Translated from Prodigy pGCL: inference/loopy/skip_exceeding_sum.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = c
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+sum := 0;
+c := 0;
+while (sum < 10) do
+  temp :~ unif[0, 10];
+  sum := sum + temp;
+  c := c + 1;
+end
+return c;

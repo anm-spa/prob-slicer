@@ -1,0 +1,80 @@
+// @METADATA:name        = manufacturing-simulation
+// @METADATA:description = This program models an asymmetric three-stage industrial manufacturing and telemetry pipeline.
+// @METADATA:reference   = Gemini/Delphi
+// @METADATA:criterion   = final_yield
+// @METADATA:expected    = unknown
+// @METADATA:tags        = LLM-generated 
+
+
+// === MULTI-STAGE STATE VARIABLES ===
+materials := initial_raw_materials;
+refined_units := 0;
+final_yield := 0.0;
+
+// Independent Control Sinks
+grid_voltage := 220.0;
+hazard_level := 0.0;
+emergency_halt := False;
+
+// =================================================================
+// LOOP 1: CORE REFINING PHASE (Dynamic Boundary Exit)
+// =================================================================
+while (materials > 5.0 && emergency_halt!=0) do
+    process_rate :~ gaussian(4.0, 0.5);
+    materials := materials - process_rate;
+    refined_units := refined_units + 1;
+
+    leak_glitch :~ bernoulli(0.1);
+    if (leak_glitch = 1) then
+        hazard_level := hazard_level + 15.0;
+    else
+        skip; // Explicit empty-branch baseline
+    end
+    
+    if (hazard_level > 40.0) then
+        emergency_halt := True; 
+    else
+        skip;
+    end
+end
+
+// =================================================================
+// LOOP 2: BACKGROUND HEALTH DIAGNOSTICS (Stochastic Non-Termination Trap)
+// =================================================================
+while (grid_voltage > 200.0) do
+    surge_drop :~ unif[0,2]; // Drop, Stabilize, Spike
+    
+    if (surge_drop = 0) then
+        grid_voltage := grid_voltage - 2.0;
+    else
+        if (surge_drop = 2) then
+            grid_voltage := grid_voltage + 8.0; 
+        else
+            skip; // Stabilized iteration
+        end
+    end
+    
+    if (grid_voltage < 205.0) then
+        grid_voltage := 215.0; // Trap: Resets state, preventing termination infinitely
+    else
+        skip;
+    end
+end
+
+// =================================================================
+// LOOP 3: QUALITY CONTROL PHASE (Post-Conditioning)
+// =================================================================
+j := 0;
+while (j < refined_units) do
+    j := j + 1;
+    
+    defect_check :~ bernoulli(0.05);
+    if (defect_check!=0) then
+        value_multiplier :~ unif[10.0, 12.0];
+        final_yield := final_yield + value_multiplier;
+    else
+        skip; 
+    end
+end
+
+return final_yield;

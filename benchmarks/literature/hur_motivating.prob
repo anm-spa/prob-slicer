@@ -1,0 +1,20 @@
+// @METADATA:name        = hur_motivating
+// @METADATA:description = Motivating example from Hur et al. (2014) Figure 1.
+//                         Shows classical slicing is unsound for probabilistic
+//                         programs. A classical slicer removes observe(y=1)
+//                         since y has no data dep on x, but this changes the
+//                         posterior of x. The key soundness argument.
+// @METADATA:reference   = Hur Nori Rajamani Samuel (2014) Slicing
+//                         Probabilistic Programs. PLDI 2014
+// @METADATA:criterion   = x
+// @METADATA:expected    = z sliced out; observe(y=1) MUST be kept despite
+//                         y not in classical data dep of x; y kept via
+//                         observe dependence; KEY soundness example
+// @METADATA:tags        = observe, soundness, classical-vs-probabilistic,
+//                         key-example, hur-pldi14
+
+x :~ bernoulli(0.5);
+y :~ bernoulli(0.5);
+observe(y = 1);
+z := 42;
+return x;

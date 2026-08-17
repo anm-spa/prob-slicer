@@ -1,0 +1,24 @@
+// @METADATA:name        = prodigy_loop_equivalence_sequential_loops
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/sequential_loops.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = tmp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (0 < n) do
+  tmp :~ unif[1, 6];
+  m := m + tmp;
+  tmp := 0;
+  n := n - 1;
+end
+while (m > 0) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    m := m + 1;
+  else
+    m := m - 1;
+  end
+  c := c + 1;
+  tmp := 0;
+end
+return tmp;

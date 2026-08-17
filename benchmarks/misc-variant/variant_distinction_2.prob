@@ -1,0 +1,27 @@
+// @METADATA:name        = variant_distinction_2
+// @METADATA:description = Observe after a potentially nonterminating loop.
+//                         The observe conditions on a variable set after
+//                         the loop. Under ns, the while predicate is
+//                         scd-dependent on the observe node (nonterminating
+//                         path never reaches observe). Under nids, it is not.
+// @METADATA:reference   = Constructed to distinguish ns vs nids
+// @METADATA:criterion   = x
+// @METADATA:expected    = ns: loop kept via scd on observe node;
+//                         nids: loop sliced (observe post-dominates while);
+//                         ni: loop sliced, observe may also be sliced
+// @METADATA:tags        = loop, nontermination, observe, ns-vs-nids,
+//                         key-example
+
+coin :~ bernoulli(0.5);
+// Loop may not terminate
+while coin = 1 do
+    coin :~ bernoulli(0.5);
+end
+// x is set AFTER the loop
+x :~ bernoulli(0.5);
+// Observe is AFTER the loop — post-dominates while under wcd
+// but not under scd (nonterminating path never reaches observe)
+observe(x = 1);
+// Irrelevant
+z := 99;
+return x;

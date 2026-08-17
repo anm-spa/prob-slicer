@@ -1,0 +1,17 @@
+// @METADATA:name        = prodigy_loop_equivalence_bit_flip_conditioning
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/bit_flip_conditioning.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = temp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (! ( ( b1 = 0 ) && ( b2 = 0 ) )) do
+  b1 :~ unif[0, 1];
+  b2 :~ unif[0, 1];
+  observe(( b1 = 0 && b3 = 0 ) || ( b1 = 1 && b3 = 1 ) || ( b2 = 0 && b4 = 0 ) || ( b2 = 1 && b4 = 1 ));
+  b3 := b1;
+  b4 := b2;
+  i := i + 1;
+  temp := 0;
+end
+return temp;

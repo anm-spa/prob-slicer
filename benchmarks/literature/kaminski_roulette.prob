@@ -1,0 +1,26 @@
+// @METADATA:name        = kaminski_roulette
+// @METADATA:description = Roulette gambling loop from Kaminski et al. (2018)
+//                         Example 1.1. Player doubles bet until win or bankrupt.
+//                         Classic example for expected run-time analysis.
+// @METADATA:reference   = Kaminski Katoen Matheja Olmedo (2018) Weakest
+//                         Precondition Reasoning for Expected Run-Times of
+//                         Probabilistic Programs. TOPLAS 2018
+// @METADATA:criterion   = bankroll
+// @METADATA:expected    = rounds sliced out; bet kept via control dep;
+//                         win kept via data dep; loop kept by ns
+// @METADATA:tags        = loop, nontermination, expected-runtime, gambling
+
+bankroll := 8;
+bet      := 1;
+win      :~ bernoulli(0.5);
+while win = 0 do
+    if bankroll >= bet then
+        bankroll := bankroll - bet;
+        bet      := bet + bet;
+        win      :~ bernoulli(0.5);
+    else
+        bet := 0;
+    end
+end
+rounds := 0;
+return bankroll;

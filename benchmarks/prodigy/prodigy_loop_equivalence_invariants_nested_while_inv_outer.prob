@@ -1,0 +1,18 @@
+// @METADATA:name        = prodigy_loop_equivalence_invariants_nested_while_inv_outer
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/invariants/nested_while_inv_outer.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = temp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+if (x > 0) then
+  temp := c;
+  c :~ unif[0, 1];
+  c := c + temp;
+  x := 0;
+  y := 0;
+  temp := 0;
+else
+  skip;
+end
+return temp;

@@ -1,0 +1,16 @@
+// @METADATA:name        = prodigy_inference_loop_free_conditioning_monty_hall_nested
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/monty_hall_nested.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = switch
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+prize :~ unif[1, 3];
+player :~ unif[1, 3];
+door :~ unif[1, 3];
+observe(! ( prize = door || player = door ));
+switch :~ unif[1, 3];
+observe(! ( switch = player || switch = door ));
+player := switch;
+switch := 0;
+return switch;

@@ -1,0 +1,15 @@
+// @METADATA:name        = prodigy_inference_loop_free_conditioning_evidence1
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/evidence1.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = coin
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+evidence :~ unif[0, 1];
+if (evidence = 1) then
+  coin :~ unif[0, 1];
+  observe(coin = 1);
+else
+  skip;
+end
+return coin;

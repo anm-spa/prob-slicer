@@ -1,0 +1,16 @@
+// @METADATA:name        = prodigy_template_parameter_synthesis_invariants_geometric_parameter_invariant
+// @METADATA:description = Translated from Prodigy pGCL: template_parameter_synthesis/invariants/geometric_parameter_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = temp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated template_parameter_synthesis
+
+if (x = 1) then
+  temp :~ unif[0, 1];
+  c := c + temp;
+  x := 0;
+  temp := 0;
+else
+  skip;
+end
+return temp;

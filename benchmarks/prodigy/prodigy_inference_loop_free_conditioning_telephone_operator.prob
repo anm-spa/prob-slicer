@@ -1,0 +1,15 @@
+// @METADATA:name        = prodigy_inference_loop_free_conditioning_telephone_operator
+// @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/telephone_operator.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = d
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated inference
+
+x :~ unif[0, 1];
+if (x = 0) then
+  d :~ unif[0, 1];
+else
+  d :~ unif[0, 1];
+end
+observe(d = 3);
+return d;

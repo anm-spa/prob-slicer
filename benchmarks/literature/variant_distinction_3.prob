@@ -1,0 +1,30 @@
+// @METADATA:name        = variant_distinction_3
+// @METADATA:description = True nids vs ni distinction. A nonterminating
+//                         loop contains an observe. Under nids (obsntd),
+//                         the loop while predicate is an obsntd source
+//                         (nonterminating loop node) so it generates
+//                         obsntd edges to downstream nodes.
+//                         Under ni (obsd), nonterminating loop nodes
+//                         are NOT obsd sources — only observe nodes are.
+//                         So ni slices the loop but nids keeps it.
+// @METADATA:reference   = Constructed to distinguish nids vs ni
+// @METADATA:criterion   = x
+// @METADATA:expected    = nids: loop kept (while predicate is obsntd
+//                         source, generates edges to x and return);
+//                         ni: loop may be sliced (while predicate is
+//                         NOT obsd source)
+// @METADATA:tags        = loop, nontermination, observe, nids-vs-ni,
+//                         key-example
+
+coin :~ bernoulli(0.5);
+x    :~ bernoulli(0.5);
+// Nonterminating loop — coin may always be 1
+// while predicate is obsntd source (nids) but NOT obsd source (ni)
+while coin = 1 do
+    coin :~ bernoulli(0.5);
+    x    :~ bernoulli(0.5);
+end
+// x is set after the loop
+observe(x = 1);
+z := 99;
+return x;

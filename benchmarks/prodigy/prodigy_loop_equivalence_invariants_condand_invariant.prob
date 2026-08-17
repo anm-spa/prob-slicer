@@ -1,0 +1,13 @@
+// @METADATA:name        = prodigy_loop_equivalence_invariants_condand_invariant
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/invariants/condand_invariant.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = x
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+if (( 0 < n ) && ( 0 < m )) then
+  skip;
+else
+  skip;
+end
+return x;

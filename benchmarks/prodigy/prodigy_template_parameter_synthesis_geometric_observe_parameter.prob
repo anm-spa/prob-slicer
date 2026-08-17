@@ -1,0 +1,19 @@
+// @METADATA:name        = prodigy_template_parameter_synthesis_geometric_observe_parameter
+// @METADATA:description = Translated from Prodigy pGCL: template_parameter_synthesis/geometric_observe_parameter.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = tmp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated template_parameter_synthesis
+
+while (y = 1) do
+  _coin :~ unif[0, 1];
+  if (_coin <= p) then
+    y := 0;
+  else
+    y := 1;
+  end
+  x := x + 1;
+  observe(x < 3);
+  tmp := 0;
+end
+return tmp;

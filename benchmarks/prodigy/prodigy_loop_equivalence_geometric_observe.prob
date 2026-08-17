@@ -1,0 +1,19 @@
+// @METADATA:name        = prodigy_loop_equivalence_geometric_observe
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/geometric_observe.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = tmp
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (y = 1) do
+  _coin :~ unif[0, 1];
+  if (_coin <= 1 / 2) then
+    y := 0;
+  else
+    y := 1;
+  end
+  x := x + 1;
+  observe(x < 3);
+  tmp := 0;
+end
+return tmp;

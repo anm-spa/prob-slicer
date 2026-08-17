@@ -1,0 +1,22 @@
+// @METADATA:name        = prodigy_loop_equivalence_nested_while
+// @METADATA:description = Translated from Prodigy pGCL: loop_equivalence/nested_while.pgcl
+// @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
+// @METADATA:criterion   = c
+// @METADATA:expected    = unknown
+// @METADATA:tags        = prodigy translated loop_equivalence
+
+while (x > 0) do
+  y := 1;
+  while (y = 1) do
+    _coin :~ unif[0, 1];
+    if (_coin <= 1 / 2) then
+      y := 0;
+    else
+      x := x + 1;
+    end
+    temp := 0;
+  end
+  x := x - 1;
+  c := c + 1;
+end
+return c;

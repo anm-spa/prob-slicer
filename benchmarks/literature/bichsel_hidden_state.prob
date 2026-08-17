@@ -1,0 +1,17 @@
+// @METADATA:name        = bichsel_hidden_state
+// @METADATA:description = Hidden state inference from Bichsel et al. (2018)
+//                         Section 3. Two latent variables with a single noisy
+//                         observation. Tests slicing of irrelevant latent vars.
+// @METADATA:reference   = Bichsel Gehr Tsankov Vechev (2018) Fine-grained
+//                         Semantics for Probabilistic Programs. ESOP 2018
+// @METADATA:criterion   = a
+// @METADATA:expected    = b and dummy sliced out; obs kept via observe dep;
+//                         tests that irrelevant latent variables are removed
+// @METADATA:tags        = bayesian, latent-variable, independence, observe
+
+a     :~ bernoulli(0.4);
+b     :~ bernoulli(0.6);
+obs   :~ bernoulli(0.9);
+observe(obs = a);
+dummy := b + 1;
+return a;
