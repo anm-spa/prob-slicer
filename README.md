@@ -1,9 +1,7 @@
 # prob_slicer — Static Dependence-Based Slicing for Probabilistic Programs
 
-A research prototype implementing **static backward slicing** for a small
-probabilistic imperative language, following the dependence-graph approach
-of Weiser (1984) extended with two new edge types for probabilistic semantics.
-
+A research prototype implementing **static backward slicing** for 
+an imperative probabilistic language.
 ---
 
 ## Language Syntax
@@ -56,58 +54,11 @@ ProbSlicer/
 ├── results/                  Generated output (workbook, CSVs, text summaries)
 ├── pyproject.toml            Installable package config (src/ layout)
 ├── README.md                 This file
-└── README_test_slicer.md     Detailed docs for test/test_slicer.py & friends
+└── README_Test.md            Detailed docs for test/test_slicer.py & friends
 ```
 
-See [README_test_slicer.md](README_test_slicer.md) for full usage of the
+See [README_Test.md](README_Test.md) for full usage of the
 `test/` scripts, including the automated paper-ready analysis pipeline.
-
-## Architecture
-
-```
-source string
-    │
-    ▼
-src/prob_slicer/parser.py       Hand-written recursive-descent parser
-    │                             Tokenizer → tokens → AST (ast_nodes.py)
-    ▼
-src/prob_slicer/ast_nodes.py    Algebraic ADT: AExpr, BExpr, Distr, Cmd, Program
-    │                             Each Cmd gets a unique node_id at construction time
-    ▼
-src/prob_slicer/cfg_builder.py  CFG as a NetworkX DiGraph
-    │                             Nodes: atomic commands + synthetic ENTRY(0) / EXIT(-1)
-    │                             Edges: 'seq' | 'true' | 'false' | 'back'
-    │                             Exports: cfg_to_dot()
-    ▼
-src/prob_slicer/dependence.py   Three-phase dependence analysis
-    │
-    ├── ReachingDefinitions   forward dataflow (gen/kill worklist)
-    │
-    ├── DDG  (Data Dependence Graph)
-    │        edge (d→u): def d reaches use u
-    │        dep_type: 'data' | 'stoch_data'   ← :~ is stochastic def
-    │
-    ├── CDG  (Control Dependence Graph)
-    │        post-dominator tree on reversed CFG
-    │        dep_type: 'control'
-    │
-    ├── ObsDep  (Observation Dependence)          ← probabilistic extension
-    │        edge (s→o): CSample s reaches CObserve o
-    │        dep_type: 'observation'
-    │
-    └── PDG = DDG ∪ CDG ∪ ObsDep
-             backward BFS from criterion → slice set
-    │
-    ▼
-src/prob_slicer/slicer.py       AST reconstruction from slice node set
-    │                             Prunes unreachable commands, replaces with CSkip
-    │                             pretty_print() emits clean source
-    ▼
-test/test_slicer.py             Benchmark runner (--dot, --verbose, --bench, --evaluate, ...)
-test/run_all_benchmarks.py      Runs test_slicer.py across every benchmarks/ category
-```
-
----
 
 ## Probabilistic Extensions
 
@@ -121,6 +72,101 @@ downstream analyses can distinguish deterministic from probabilistic defs.
 reaching stochastic definition at that point.  The slicer therefore seeds
 the backward slice on **{criterion node} ∪ {all observe nodes}** so that
 no conditioning statement is ever dropped when slicing a probabilistic output.
+
+---
+
+## Example: The Three Slice Types
+
+The slicer supports three variants, each preserving a different notion of
+program behaviour:
+
+| Variant | Preserves                                    | Aggressiveness |
+|---------|-----------------------------------------------|----------------|
+| `ns`    | Termination probability **and** output distribution | Least — keeps the most code |
+| `nids`  | Output distribution only (not termination probability) | Middle |
+| `ni`    | Only the qualitative/possible output values  | Most — keeps the least code |
+
+Take this program, which flips a coin, runs an unrelated bounded loop, and
+conditions on the coin:
+
+```
+guess :~ bernoulli(0.5);
+attempts := 0;
+while (attempts <= 5) do
+    attempts := attempts + 1;
+end
+observe(guess = 1);
+return guess;
+```
+
+Slicing on the `return guess` criterion gives three different results:
+
+**`ns` (nontermination-sensitive)** — keeps the loop. Even though this
+particular loop happens to always terminate, the analysis is conservative:
+any `while` loop could in principle affect the program's termination
+probability, and `ns` must preserve that exactly, so it can't be dropped.
+
+```
+guess :~ bernoulli(0.5)
+attempts := 0
+while (attempts <= 5) do
+  attempts := (attempts + 1)
+end
+observe((guess = 1))
+return guess
+```
+
+**`nids` (nontermination-insensitive, distribution-sensitive)** — drops the
+loop, since `nids` doesn't need to preserve termination probability, only
+the output *distribution*. `attempts` has no effect on `guess`'s
+distribution, so it's gone. The `observe` stays, since removing it would
+change the returned distribution.
+
+```
+guess :~ bernoulli(0.5)
+observe((guess = 1))
+return guess
+```
+
+**`ni` (nontermination-insensitive, distribution-insensitive)** — the most
+aggressive variant, preserving only which output *values* are reachable,
+not their exact probabilities. Here it produces the same slice as `nids`,
+since the `observe` is also necessary to determine which values of `guess`
+are even possible. (In general `ni` can drop more than `nids` — e.g. an
+`observe` that only reweights probabilities without ruling out any output
+value — see the `nids_ni_gap_*` benchmarks in `benchmarks/contrived/` for
+an example where `ni` produces a strictly smaller slice than `nids`.)
+
+```
+guess :~ bernoulli(0.5)
+observe((guess = 1))
+return guess
+```
+
+You can reproduce this yourself once installed (see below). `.prob` files
+need a small metadata header (see
+[README_Test.md](README_Test.md#benchmark-files)):
+
+```bash
+mkdir -p /tmp/readme_example
+cat > /tmp/readme_example/example.prob <<'EOF'
+// @METADATA:name        = example
+// @METADATA:description = Coin flip with an unrelated bounded loop
+// @METADATA:reference   = README.md
+// @METADATA:criterion   = guess
+// @METADATA:expected    = ns keeps the loop; nids/ni drop it
+
+guess :~ bernoulli(0.5);
+attempts := 0;
+while (attempts <= 5) do
+    attempts := attempts + 1;
+end
+observe(guess = 1);
+return guess;
+EOF
+
+python test/test_slicer.py --benchdir /tmp/readme_example --bench example --compare
+```
 
 ---
 
@@ -154,28 +200,14 @@ is provided for reference and for generating a more robust parser with
 Once installed (see above), run a quick sanity check from the repo root:
 
 ```bash
-python test/test_slicer.py --bench coin_flip --verbose
+python test/test_slicer.py --bench noisy_or_2t_3w --compare
 ```
 
 That's the extent of what belongs here — **all usage, CLI flags, Monte
 Carlo correctness evaluation, memory-usage tracking, saving results to
 JSON/CSV/Excel, and the automated multi-directory paper-ready analysis
 pipeline (`run_all_benchmarks.py`) are documented in
-[README_test_slicer.md](README_test_slicer.md)**, so they're not repeated
-here.
-
----
-
-## Benchmark Results (summary)
-
-| Benchmark       | Nodes | Slice | Reduction | Notes                              |
-|-----------------|-------|-------|-----------|-------------------------------------|
-| coin_flip       |   3   |   2   |  33.3%    | `z := 42` eliminated                |
-| noisy_sensor    |   7   |   5   |  28.6%    | counter k eliminated                |
-| geometric_loop  |   8   |   5   |  37.5%    | dead `if (count > 10)` eliminated   |
-| two_coins       |   5   |   3   |  40.0%    | `result2 := c2*5` eliminated        |
-| discrete_bayes  |   6   |   5   |  16.7%    | `age := 35` eliminated              |
-| random_walk     |   9   |   7   |  22.2%    | log variables eliminated            |
+[README_Test.md](README_Test.md)**, so they're not repeated here.
 
 ---
 
@@ -191,7 +223,7 @@ here.
 | `src/prob_slicer/slicer.py`              | AST reconstruction + pretty-printer  |
 | `bench-src/benchmark_loader.py`          | Loads `.prob` benchmark files        |
 | `bench-src/benchmark_generator*.py`      | Generate `.prob` benchmark files     |
-| `test/test_slicer.py`                    | Benchmark runner (see [README_test_slicer.md](README_test_slicer.md)) |
+| `test/test_slicer.py`                    | Benchmark runner (see [README_Test.md](README_Test.md)) |
 | `test/run_all_benchmarks.py`             | Orchestrates `test_slicer.py` across every `benchmarks/` category |
 | `test/evaluator.py`                      | Monte Carlo correctness evaluation   |
 | `test/get_statistics.py`                 | Paper-ready statistics + LaTeX table |
