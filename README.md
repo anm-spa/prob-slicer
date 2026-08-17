@@ -151,42 +151,18 @@ is provided for reference and for generating a more robust parser with
 
 ## Running Benchmarks
 
-Run everything from the repo root:
+Once installed (see above), run a quick sanity check from the repo root:
 
 ```bash
-# Run all benchmarks in benchmarks/real-world/ (the default directory)
-python test/test_slicer.py
-
-# Run a single benchmark
-python test/test_slicer.py --bench coin_flip
-
-# Run benchmarks from a different category directory
-python test/test_slicer.py --benchdir benchmarks/contrived
-
-# Emit Graphviz .dot files for CFG and PDG
-python test/test_slicer.py --dot
-
-# Print full dependence report (reaching defs, DDG, CDG, ObsDep edges)
-python test/test_slicer.py --verbose
-
-# Combine flags
-python test/test_slicer.py --bench discrete_bayes --verbose --dot
-
-# Run the whole benchmark suite (every benchmarks/ subdirectory) at once,
-# with Monte Carlo correctness evaluation, and produce the paper-ready
-# statistics automatically
-python test/run_all_benchmarks.py --evaluate --analyze
+python test/test_slicer.py --bench coin_flip --verbose
 ```
 
-Then render dot files:
-```bash
-dot -Tpng dot_output/coin_flip_ns_cfg.dot -o coin_flip_cfg.png
-dot -Tpng dot_output/coin_flip_ns_pdg.dot -o coin_flip_pdg.png
-```
-
-See [README_test_slicer.md](README_test_slicer.md) for the full command
-reference (correctness evaluation, memory-usage tracking, saving results
-to JSON/CSV/Excel, and the automated paper-ready analysis pipeline).
+That's the extent of what belongs here — **all usage, CLI flags, Monte
+Carlo correctness evaluation, memory-usage tracking, saving results to
+JSON/CSV/Excel, and the automated multi-directory paper-ready analysis
+pipeline (`run_all_benchmarks.py`) are documented in
+[README_test_slicer.md](README_test_slicer.md)**, so they're not repeated
+here.
 
 ---
 

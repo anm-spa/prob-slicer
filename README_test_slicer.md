@@ -12,38 +12,24 @@ run from the **repo root**.
 
 ## Requirements
 
-- Python 3.10+ (uses `from __future__ import annotations` and modern type hints)
-- `networkx`
-- `pandas` and `openpyxl` — only required for `--save-xlsx`,
-  `run_all_benchmarks.py`, `get_statistics.py`, and `data_analysis.py`
-- Repo layout (see the root [README.md](README.md#project-structure) for
-  the full tree):
-  - `src/prob_slicer/` — core slicing library (`parse`, `build_cfg`,
-    `cfg_to_dot`, `parser`, `pretty_print`, `ast_nodes`, `dependence`,
-    `slicer`). Installed as an editable package via `pyproject.toml`, so
-    `import prob_slicer` works from anywhere once installed.
-  - `bench-src/benchmark_loader.py` — loads `.prob` benchmark files.
-    Imported by scripts in `test/` via a small `sys.path` shim at the top
-    of `test_slicer.py` / `run_all_benchmarks.py` (no extra install step
-    needed for this one).
-  - `test/evaluator.py` — Monte Carlo correctness evaluation, imported
-    directly since it lives alongside `test_slicer.py`.
-  - `test/run_all_benchmarks.py` — orchestrates `test_slicer.py` across
-    every `benchmarks/<category>/` directory (imports `run_benchmark` and
-    `save_results_xlsx` directly from `test_slicer.py`).
+Install once via the root [README.md](README.md#installation)
+(`pip install -e ".[analysis]"` from the repo root) — that covers
+`networkx` plus the `pandas`/`openpyxl` extras these scripts need for
+`--save-xlsx`, `run_all_benchmarks.py`, `get_statistics.py`, and
+`data_analysis.py`. Not repeated here.
 
-Install dependencies:
+Two import-wiring details specific to these scripts, since they're spread
+across three top-level directories (see the root README's
+[Project Structure](README.md#project-structure) for the full tree):
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[analysis]"
-```
-
-This installs `prob_slicer` in editable mode (from `src/prob_slicer/`) plus
-`pandas`/`openpyxl`. See the root [README.md](README.md#installation) for
-details, including the optional `grammar` extra for regenerating the
-parser from `ProbLang.g4`.
+- `src/prob_slicer/` is only importable because it's pip-installed in
+  editable mode (`pyproject.toml`) — `import prob_slicer` then works from
+  anywhere.
+- `bench-src/benchmark_loader.py` is **not** pip-installed; `test_slicer.py`
+  and `run_all_benchmarks.py` each add `bench-src/` to `sys.path` at the
+  top of the file so `from benchmark_loader import ...` still resolves.
+- `test/evaluator.py` needs no special handling — it's imported directly
+  since it lives alongside `test_slicer.py` in `test/`.
 
 ## Benchmark Files
 
