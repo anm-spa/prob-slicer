@@ -1,5 +1,6 @@
 # prob_slicer — Static Dependence-Based Slicing for Probabilistic Programs
 
+---
 A research prototype implementing **static backward slicing** for 
 an imperative probabilistic language.
 ---
@@ -58,20 +59,23 @@ ProbSlicer/
 ```
 
 See [README_Test.md](README_Test.md) for full usage of the
-`test/` scripts, including the automated paper-ready analysis pipeline.
+`test/` scripts, including the automated analysis pipeline reproducing the results of the submitted article (see below)
 
 ## Probabilistic Extensions
 
-### 1. Stochastic Data Dependence (`stoch_data`)
-`x :~ d` is treated as a **definition** of `x` — identical to `x := a` for
-reaching-definitions — but edges through it are tagged `stoch_data` so
-downstream analyses can distinguish deterministic from probabilistic defs.
+### 1. Sampling (`x :~ d`)
+`x :~ d` samples a value from distribution `d` and assigns it to `x`.
+For dependence analysis it is treated as a **definition** of `x` —
+identical to `x := a` for reaching-definitions.
 
-### 2. Observation Dependence (`observation`)
-`observe(b)` conditions the posterior of *every* latent variable that has a
-reaching stochastic definition at that point.  The slicer therefore seeds
-the backward slice on **{criterion node} ∪ {all observe nodes}** so that
-no conditioning statement is ever dropped when slicing a probabilistic output.
+### 2. Observation (`observe(b)`)
+`observe(b)` blocks executions in which `b` evaluates to false: such
+executions are discarded and do not contribute to the output
+distribution. Executions in which `b` evaluates to true continue
+unchanged. No renormalization takes place — the semantics is
+unnormalized, so the total probability mass after an observe statement
+may be strictly less than 1, reflecting the probability that the
+observation is satisfied.
 
 ---
 
@@ -104,7 +108,7 @@ Slicing on the `return guess` criterion gives three different results:
 **`ns` (nontermination-sensitive)** — keeps the loop. Even though this
 particular loop happens to always terminate, the analysis is conservative:
 any `while` loop could in principle affect the program's termination
-probability, and `ns` must preserve that exactly, so it can't be dropped.
+probability, and `ns` preserves that exactly. 
 
 ```
 guess :~ bernoulli(0.5)
@@ -119,7 +123,7 @@ return guess
 **`nids` (nontermination-insensitive, distribution-sensitive)** — drops the
 loop, since `nids` doesn't need to preserve termination probability, only
 the output *distribution*. `attempts` has no effect on `guess`'s
-distribution, so it's gone. The `observe` stays, since removing it would
+distribution, so it's sliced away. The `observe` stays, since removing it would
 change the returned distribution.
 
 ```
@@ -128,14 +132,8 @@ observe((guess = 1))
 return guess
 ```
 
-**`ni` (nontermination-insensitive, distribution-insensitive)** — the most
-aggressive variant, preserving only which output *values* are reachable,
-not their exact probabilities. Here it produces the same slice as `nids`,
-since the `observe` is also necessary to determine which values of `guess`
-are even possible. (In general `ni` can drop more than `nids` — e.g. an
-`observe` that only reweights probabilities without ruling out any output
-value — see the `nids_ni_gap_*` benchmarks in `benchmarks/contrived/` for
-an example where `ni` produces a strictly smaller slice than `nids`.)
+**ni (nontermination-insensitive, distribution-insensitive)** — the most permissive variant. It allows the sliced program to increase the probability of return values compared with the original program, as probability mass from nonterminating or blocked executions may become terminating after statements are removed. Unlike the nontermination-sensitive variants, it does not require the sliced program to preserve the original nontermination probability. In this example, `ni` produces the same slice as `nids`, because the `observe` is necessary to prevent additional values of `guess` from becoming possible. In general, however, `ni` can produce a strictly smaller slice than `nids`, as illustrated by the `nids_ni_gap_*` benchmarks in `benchmarks/contrived/`.
+
 
 ```
 guess :~ bernoulli(0.5)
@@ -205,9 +203,9 @@ python test/test_slicer.py --bench noisy_or_2t_3w --compare
 
 That's the extent of what belongs here — **all usage, CLI flags, Monte
 Carlo correctness evaluation, memory-usage tracking, saving results to
-JSON/CSV/Excel, and the automated multi-directory paper-ready analysis
+JSON/CSV/Excel, and the automated multi-directory benchmark analysis
 pipeline (`run_all_benchmarks.py`) are documented in
-[README_Test.md](README_Test.md)**, so they're not repeated here.
+[README_Test.md](README_Test.md)**.
 
 ---
 
@@ -226,7 +224,7 @@ pipeline (`run_all_benchmarks.py`) are documented in
 | `test/test_slicer.py`                    | Benchmark runner (see [README_Test.md](README_Test.md)) |
 | `test/run_all_benchmarks.py`             | Orchestrates `test_slicer.py` across every `benchmarks/` category |
 | `test/evaluator.py`                      | Monte Carlo correctness evaluation   |
-| `test/get_statistics.py`                 | Paper-ready statistics + LaTeX table |
+| `test/get_statistics.py`                 | reproducible statistics              |
 | `test/data_analysis.py`                  | Quick headline stats + summary text  |
 | `pyproject.toml`                         | Installable `src/` layout package config |
 
