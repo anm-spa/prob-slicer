@@ -30,7 +30,12 @@ _META_RE = re.compile(
 _REQUIRED_KEYS = {'name', 'description', 'reference', 'criterion', 'expected'}
 
 # Metadata keys that are optional
-_OPTIONAL_KEYS = {'tags'}
+# 'license' — the benchmark's own license, if known (e.g. 'Apache-2.0',
+# 'MIT', or 'Unknown' when the source is cited but its license isn't).
+# This is independent of ProbSlicer's own MIT license — see the
+# "License" section of README.md. Not required, since most existing
+# benchmark files predate this field and haven't been back-filled yet.
+_OPTIONAL_KEYS = {'tags', 'license'}
 
 
 def _parse_file(path: Path) -> dict[str, Any]:
@@ -88,6 +93,8 @@ def _parse_file(path: Path) -> dict[str, Any]:
         'criterion':   meta['criterion'],
         'expected':    meta['expected'],
         'tags':        tags,
+        # Optional; None when not yet annotated (most existing files).
+        'license':     meta.get('license'),
         'source':      source,
         'path':        str(path),
     }

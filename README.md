@@ -243,3 +243,19 @@ criterion set directly to `DependenceAnalysis.backward_slice({n1, n2, ...})`.
 **Thin vs. probabilistically-correct slices**: remove `da.observe_nodes()`
 from the seed set in `test/test_slicer.py`'s criterion-finding logic to get
 a classical thin slice that ignores observation conditioning.
+
+---
+
+## License
+
+The ProbSlicer source code is released under the MIT License. See
+[LICENSE](LICENSE).
+
+The `benchmarks/` directory contains benchmark programs originating from
+or derived from third-party projects and publications. These benchmark
+programs may be subject to licenses different from the MIT License.
+Where the source and licensing information of a benchmark is known, the
+original license and attribution should be retained and respected.
+The MIT License for ProbSlicer does not supersede or replace the license
+of any third-party benchmark. Users are responsible for complying with
+the applicable license terms for third-party benchmark programs.
