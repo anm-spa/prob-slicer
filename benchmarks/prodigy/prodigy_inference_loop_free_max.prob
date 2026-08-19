@@ -5,15 +5,18 @@
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated inference
 
-max := ;
-if (x > y) then
-  res := x;
+a :~ bernoulli(1 / 2);
+b :~ bernoulli(1 / 2);
+if (a > b) then
+  res := a;
 else
-  res := y;
+  res := b;
 end
-a :~ unif[0, 1];
-b :~ unif[0, 1];
-r := max ( a , b );
 a := 0;
 b := 0;
-return b;
+if (res = 1) then
+  val := 1;
+else
+  val := 0;
+end
+return val;

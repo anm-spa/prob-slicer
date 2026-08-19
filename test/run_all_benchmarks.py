@@ -59,7 +59,8 @@ sys.path.insert(0, str(REPO_ROOT / 'bench-src'))
 from benchmark_loader import load_benchmarks
 from prob_slicer.dependence import SliceVariant, set_debug
 from test_slicer import (
-    run_benchmark, save_results_xlsx, print_summary, summary_to_text,
+    run_benchmark, run_benchmark_isolated,
+    save_results_xlsx, print_summary, summary_to_text,
 )
 
 BENCHMARKS_ROOT = REPO_ROOT / 'benchmarks'
@@ -80,23 +81,56 @@ def run_directory(
     variants: list[SliceVariant],
     evaluate: bool,
     n_eval_runs: int,
-) -> list[dict]:
-    """Run every benchmark in bench_dir under every variant; return results."""
+    isolate_subprocess: bool = False,
+) -> tuple[list[dict], list[tuple[str, str, str, str]]]:
+    """
+    Run every benchmark in bench_dir under every variant; return results.
+
+    run_all_benchmarks.py runs every category directory and every
+    benchmark/variant inside ONE shared Python process, so peak_rss_kb
+    (a process-wide, monotonically non-decreasing high-water mark) is
+    NOT independently attributable to any single benchmark/variant —
+    it's contaminated by whatever ran earlier, possibly in an entirely
+    different category. rss_delta_kb helps but is still order-dependent
+    (it reads ~0 whenever an earlier run already set a higher peak).
+
+    With isolate_subprocess=True, each benchmark x variant instead runs
+    in its own fresh subprocess via run_benchmark_isolated(), so
+    peak_rss_kb starts near-zero every time and becomes genuinely
+    comparable across variants/benchmarks/categories — the only way to
+    faithfully compute max/avg peak RSS per variant or per category.
+    This is slower (one process launch per benchmark x variant) and
+    needs enough RAM to run each benchmark standalone.
+    """
     benchmarks = load_benchmarks(benchmarks_dir=bench_dir)
     results: list[dict] = []
+    failed: list[tuple[str, str, str, str]] = []  # (name, variant, dir, error)
     for b in benchmarks:
         for variant in variants:
             print(f"  [RUN] {b['name']} / {variant.upper()}")
             try:
-                r = run_benchmark(
-                    b, variant=variant,
-                    evaluate=evaluate, n_eval_runs=n_eval_runs,
-                )
+                if isolate_subprocess:
+                    r = run_benchmark_isolated(
+                        b, variant=variant, bench_dir=bench_dir,
+                        evaluate=evaluate, n_eval_runs=n_eval_runs,
+                    )
+                    if r is None:
+                        failed.append((
+                            b['name'], variant, bench_dir.name,
+                            'isolated subprocess failed',
+                        ))
+                        continue
+                else:
+                    r = run_benchmark(
+                        b, variant=variant,
+                        evaluate=evaluate, n_eval_runs=n_eval_runs,
+                    )
                 results.append(r)
             except Exception as e:
                 print(f"  [ERROR] {b['name']!r} variant={variant} "
                       f"in {bench_dir.name}: {e}")
-    return results
+                failed.append((b['name'], variant, bench_dir.name, str(e)))
+    return results, failed
 
 
 if __name__ == '__main__':
@@ -153,6 +187,19 @@ if __name__ == '__main__':
         help='With --analyze, also save get_statistics.py\'s full output '
              'to this text file (default: results/statistics_summary.txt)'
     )
+    ap.add_argument(
+        '--isolate-subprocess', action='store_true',
+        help=(
+            'Run each benchmark x variant in its own fresh subprocess '
+            'instead of the shared process this script normally runs '
+            'everything in. Required if you want peak_rss_kb to be '
+            'faithfully comparable across variants/benchmarks/categories '
+            '(e.g. to compute max/avg peak memory per variant or per '
+            'category) — otherwise it is a process-wide, order-dependent '
+            'high-water mark, not a per-benchmark measurement. Slower, '
+            'and needs enough RAM to run your largest benchmark alone.'
+        )
+    )
     args = ap.parse_args()
     set_debug(False)
 
@@ -195,14 +242,17 @@ if __name__ == '__main__':
           f"Evaluate: {args.evaluate}  Output: {out_path}")
 
     summary_sections: list[str] = []
+    all_failed: list[tuple[str, str, str, str]] = []
 
     for bench_dir in bench_dirs:
         sheet_name = bench_dir.name
         print(f"\n[INFO] === {sheet_name} ===")
-        results = run_directory(
+        results, failed = run_directory(
             bench_dir, variants,
             evaluate=args.evaluate, n_eval_runs=args.eval_runs,
+            isolate_subprocess=args.isolate_subprocess,
         )
+        all_failed.extend(failed)
         if not results:
             print(f"[WARNING] No results for {sheet_name}, skipping sheet.")
             continue
@@ -214,7 +264,17 @@ if __name__ == '__main__':
 
         save_results_xlsx(results, str(out_path), sheet_name)
 
-    print(f"\n[DONE] Wrote {len(bench_dirs)} sheet(s) to {out_path}")
+    if all_failed:
+        print(f"\n{'─'*72}")
+        print(f"  FAILED ({len(all_failed)} benchmark x variant run(s)):")
+        for name, variant, dir_name, err in all_failed:
+            first_line = err.splitlines()[0] if err else ''
+            print(f"    [{dir_name}] {name}  variant={variant.upper()}  "
+                  f"— {first_line}")
+        print(f"{'─'*72}")
+
+    print(f"\n[DONE] Wrote {len(bench_dirs)} sheet(s) to {out_path} "
+          f"({len(all_failed)} benchmark x variant run(s) failed)")
 
     if args.summary and summary_sections:
         summary_txt_path = Path(args.save_summary_txt)

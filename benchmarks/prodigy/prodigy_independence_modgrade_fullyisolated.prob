@@ -5,22 +5,22 @@
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated independence
 
-d :~ unif[0, 1];
-i :~ unif[0, 1];
-e :~ unif[0, 1];
+d :~ bernoulli(6 / 10);
+i :~ bernoulli(7 / 10);
+e :~ bernoulli(7 / 10);
 if (i = 0) then
-  g :~ unif[0, 1];
+  g :~ bernoulli(3 / 10);
 else
-  g :~ unif[0, 1];
+  g :~ bernoulli(5 / 10);
 end
 if (i = 0) then
-  s :~ unif[0, 1];
+  s :~ bernoulli(2 / 10);
 else
-  s :~ unif[0, 1];
+  s :~ bernoulli(9 / 10);
 end
 if (e = 0) then
-  f :~ unif[0, 1];
+  f :~ bernoulli(7 / 10);
 else
-  f :~ unif[0, 1];
+  f :~ bernoulli(8 / 10);
 end
 return f;

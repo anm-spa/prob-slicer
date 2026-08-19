@@ -13,7 +13,7 @@ if (5 < cipher) then
 else
   skip;
 end
-fail :~ unif[0, 1];
+fail :~ bernoulli(p);
 if (fail = 1) then
   skip;
 else

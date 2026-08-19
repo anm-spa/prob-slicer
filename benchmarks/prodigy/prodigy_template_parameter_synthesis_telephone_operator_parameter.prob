@@ -5,7 +5,7 @@
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated template_parameter_synthesis
 
-x :~ unif[0, 1];
+x :~ bernoulli(p);
 if (x = 0) then
   d :~ unif[0, 1];
 else

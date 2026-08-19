@@ -236,7 +236,7 @@ if HAS_MEMORY:
     print(SEP)
     mem_by_variant = (
         combined.groupby("Variant")[["rss_kb", "py_kb"]]
-        .agg(["max", "mean"])
+        .agg(["max", "mean", "median"])
         .reindex(VARIANTS)
     )
     for v in VARIANTS:
@@ -245,7 +245,8 @@ if HAS_MEMORY:
         row = mem_by_variant.loc[v]
         print(f"  {v:<6}  "
               f"RSS: peak={row[('rss_kb','max')]:>10.1f} KB  "
-              f"avg={row[('rss_kb','mean')]:>10.1f} KB   |  "
+              f"avg={row[('rss_kb','mean')]:>10.1f} KB  "
+              f"median={row[('rss_kb','median')]:>10.1f} KB   |  "
               f"Py alloc: peak={row[('py_kb','max')]:>10.1f} KB  "
               f"avg={row[('py_kb','mean')]:>10.1f} KB")
 
@@ -254,7 +255,7 @@ if HAS_MEMORY:
     print(SEP)
     mem_by_cat_variant = (
         combined.groupby(["Category", "Variant"])[["rss_kb", "py_kb"]]
-        .agg(["max", "mean"])
+        .agg(["max", "mean", "median"])
         .reindex(
             pd.MultiIndex.from_product(
                 [list(SHEET_CATEGORY.values()), VARIANTS],
@@ -264,16 +265,21 @@ if HAS_MEMORY:
     )
     for cat in SHEET_CATEGORY.values():
         print(f"\n  [{cat}]")
+        printed_any = False
         for v in VARIANTS:
             key = (cat, v)
             if key not in mem_by_cat_variant.index or mem_by_cat_variant.loc[key].isna().all():
                 continue
+            printed_any = True
             row = mem_by_cat_variant.loc[key]
             print(f"    {v:<6}  "
                   f"RSS: peak={row[('rss_kb','max')]:>10.1f} KB  "
-                  f"avg={row[('rss_kb','mean')]:>10.1f} KB   |  "
+                  f"avg={row[('rss_kb','mean')]:>10.1f} KB  "
+                  f"median={row[('rss_kb','median')]:>10.1f} KB   |  "
                   f"Py alloc: peak={row[('py_kb','max')]:>10.1f} KB  "
                   f"avg={row[('py_kb','mean')]:>10.1f} KB")
+        if not printed_any:
+            print(f"    (no data — this category wasn't run in this workbook)")
 
     print(f"\n{SEP}")
     print("0e. MEMORY USAGE (PEAK / AVERAGE) PER BENCHMARK x VARIANT")
@@ -305,6 +311,8 @@ overall = (
     .reset_index()
 )
 for _, row in overall.iterrows():
+    if pd.isna(row['n']) or row['n'] == 0:
+        continue
     print(f"  {row['Variant']:<6}  n={int(row['n']):>4}  "
           f"mean={pct(row['mean'])}  "
           f"max={pct(row['max'])}  "
@@ -327,10 +335,16 @@ by_cat = (
 for cat in SHEET_CATEGORY.values():
     print(f"\n  [{cat}]")
     sub = by_cat[by_cat["Category"] == cat]
+    printed_any = False
     for _, row in sub.iterrows():
+        if pd.isna(row['n']) or row['n'] == 0:
+            continue
+        printed_any = True
         print(f"    {row['Variant']:<6}  n={int(row['n']):>4}  "
               f"mean={pct(row['mean'])}  "
               f"max={pct(row['max'])}")
+    if not printed_any:
+        print(f"    (no data — this category wasn't run in this workbook)")
 
 print(f"\n{SEP}")
 print("3. TOP 10 REDUCTIONS ACROSS ALL BENCHMARKS")
@@ -399,12 +413,18 @@ time_stats = (
 for cat in SHEET_CATEGORY.values():
     print(f"\n  [{cat}]")
     sub = time_stats[time_stats["Category"] == cat]
+    printed_any = False
     for _, row in sub.iterrows():
+        if pd.isna(row['n']) or row['n'] == 0:
+            continue
+        printed_any = True
         print(f"    {row['Variant']:<6}  "
               f"mean={row['mean']:.2f}±{row['std']:.2f} ms  |  "
               f"median={row['median']:.2f} ms "
               f"[IQR {row['q1']:.2f}-{row['q3']:.2f}]  |  "
               f"max={row['max']:.2f} ms  (n={int(row['n'])})")
+    if not printed_any:
+        print(f"    (no data — this category wasn't run in this workbook)")
 
 # Overall (across all categories combined), excluding outliers
 print(f"\n  [OVERALL, excl. outliers]")
@@ -423,6 +443,8 @@ overall_time = (
     .reset_index()
 )
 for _, row in overall_time.iterrows():
+    if pd.isna(row['n']) or row['n'] == 0:
+        continue
     print(f"    {row['Variant']:<6}  "
           f"mean={row['mean']:.2f}±{row['std']:.2f} ms  |  "
           f"median={row['median']:.2f} ms "

@@ -206,7 +206,7 @@ Provides a supplementary view of Python-level heap object allocations:
 
 ---
 
-## Automated Paper-Ready Analysis
+## Automated Analysis Pipeline (to reproduce results of the submitted article)
 
 `run_all_benchmarks.py` automates the paper's multi-category benchmark suite pipeline. It discovers every subdirectory inside `benchmarks/` containing `.prob` files, executes all selected benchmarks, and writes each directory's results into a designated sheet inside `results/experimental-result.xlsx`.
 
@@ -215,7 +215,7 @@ Provides a supplementary view of Python-level heap object allocations:
 python test/run_all_benchmarks.py
 
 # Full run with Monte Carlo evaluation + statistical analysis
-python test/run_all_benchmarks.py --evaluate --eval-runs 2000 --analyze
+python test/run_all_benchmarks.py --evaluate --eval-runs 10000 --analyze
 
 # Target specific benchmark directories
 python test/run_all_benchmarks.py --dirs prodigy real-world
@@ -228,7 +228,7 @@ python test/run_all_benchmarks.py --evaluate --summary --save-summary-txt result
 
 ### Downstream Analysis (`get_statistics.py` & `data_analysis.py`)
 
-Once the workbook is generated, analysis tools auto-discover all sheets in the Excel file without hardcoded category maps:
+Once the workbook is generated, analysis tools auto-discover all sheets in the Excel file:
 
 ```bash
 # Full paper-ready statistics + LaTeX table generation
@@ -246,7 +246,7 @@ python test/get_statistics.py --xlsx results/my-results.xlsx --sheets prodigy re
 To execute all benchmark directories, evaluate correctness, save Excel worksheets, output run summaries, and print paper-ready statistical/memory analysis:
 
 ```bash
-python test/run_all_benchmarks.py --evaluate --summary --analyze
+python test/run_all_benchmarks.py -dirs prodigy real-world literature --evaluate --summary --analyze --save-summary-txt results/summary.txt
 ```
 
 ---

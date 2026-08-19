@@ -5,8 +5,8 @@
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated independence
 
-firstCoin :~ unif[0, 1];
-secondCoin :~ unif[0, 1];
+firstCoin :~ bernoulli(1 / 2);
+secondCoin :~ bernoulli(1 / 2);
 if (firstCoin = secondCoin) then
   equal := 1;
 else

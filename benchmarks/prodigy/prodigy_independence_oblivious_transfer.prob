@@ -10,7 +10,7 @@ m0 := 1;
 m1 := 2;
 r0 :~ unif[0, 7];
 r1 :~ unif[0, 7];
-d :~ unif[0, 1];
+d :~ bernoulli(0.5);
 if (d = 0) then
   rd := r0;
   r1d := r1;

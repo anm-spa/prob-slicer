@@ -1,7 +1,7 @@
 // @METADATA:name        = prodigy_inference_loop_free_conditioning_lucky_throw
 // @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/lucky_throw.pgcl
 // @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
-// @METADATA:criterion   = hand
+// @METADATA:criterion   = lucky_throw
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated inference
 
@@ -14,4 +14,4 @@ else
 end
 hand := hand + die;
 observe(hand = sum);
-return hand;
+return lucky_throw;

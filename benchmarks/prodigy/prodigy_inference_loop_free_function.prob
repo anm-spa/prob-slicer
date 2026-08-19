@@ -5,7 +5,7 @@
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated inference
 
-f := ;
+f := 2;
 skip;
-x := f ( 2 );
+x := 20*f+2;
 return x;

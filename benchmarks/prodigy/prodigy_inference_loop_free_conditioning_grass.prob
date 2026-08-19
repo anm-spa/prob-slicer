@@ -5,22 +5,22 @@
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated inference
 
-cloudy :~ unif[0, 1];
+cloudy :~ bernoulli(1 / 2);
 if (cloudy = 1) then
-  rain :~ unif[0, 1];
-  sprinkler :~ unif[0, 1];
+  rain :~ bernoulli(8 / 10);
+  sprinkler :~ bernoulli(1 / 10);
 else
-  rain :~ unif[0, 1];
-  sprinkler :~ unif[0, 1];
+  rain :~ bernoulli(2 / 10);
+  sprinkler :~ bernoulli(5 / 10);
 end
-temp1 :~ unif[0, 1];
+temp1 :~ bernoulli(7 / 10);
 if (temp1 = 1 && rain = 1) then
   wetRoof := 1;
 else
   skip;
 end
-temp2 :~ unif[0, 1];
-temp3 :~ unif[0, 1];
+temp2 :~ bernoulli(9 / 10);
+temp3 :~ bernoulli(9 / 10);
 if (( temp2 = 1 && rain = 1 ) || ( temp3 = 1 && sprinkler = 1 )) then
   wetGrass := 1;
 else

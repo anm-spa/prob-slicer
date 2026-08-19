@@ -1,7 +1,7 @@
 // @METADATA:name        = prodigy_inference_loop_free_conditioning_infer_geom_mix
 // @METADATA:description = Translated from Prodigy pGCL: inference/loop_free/conditioning/infer_geom_mix.pgcl
 // @METADATA:reference   = LKlinke/Prodigy (github.com/LKlinke/Prodigy)
-// @METADATA:criterion   = res
+// @METADATA:criterion   = c
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated inference
 
@@ -22,4 +22,4 @@ else
   skip;
 end
 observe(res = 4);
-return res;
+return c;

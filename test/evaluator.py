@@ -15,9 +15,15 @@ from prob_slicer.dependence import SliceVariant
 from prob_slicer.ast_nodes import (
     Cmd, CSkip, CAssign, CSample, CObserve,
     CIf, CWhile, CSeq, Program,
-    AExpr, AInt, AReal, AVar, ABinOp, ANeg,
+    AExpr, AInt, AReal, AVar, ABinOp, ANeg, ASamplePGF,
     BExpr, BTrue, BFalse, BNot, BBinOp, BCompare,
 )
+
+
+class UnsupportedDistributionError(NotImplementedError):
+    """Raised when Monte Carlo evaluation hits a distribution/expression
+    form it doesn't know how to sample from (e.g. sample_pgf)."""
+    pass
 
 
 _MAX_LOOP = 5000
@@ -50,6 +56,14 @@ def _eval_a(e, env: dict):
         if op == '*': return l * r
         if op == '/': return l // r if r else 0
         if op == '%': return l %  r if r else 0
+    if t is ASamplePGF:
+        raise UnsupportedDistributionError(
+            f"Monte Carlo evaluation does not support the distribution "
+            f"function 'sample_pgf' (found: {e}). This is a Prodigy pGCL "
+            f"construct for stating closed-form loop invariants via "
+            f"probability generating functions; prob_slicer's evaluator "
+            f"can parse and slice it, but cannot sample from it."
+        )
     raise NotImplementedError(type(e))
 
 

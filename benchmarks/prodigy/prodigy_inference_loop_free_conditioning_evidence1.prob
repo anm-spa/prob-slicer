@@ -5,9 +5,9 @@
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated inference
 
-evidence :~ unif[0, 1];
+evidence :~ bernoulli(1 / 2);
 if (evidence = 1) then
-  coin :~ unif[0, 1];
+  coin :~ bernoulli(1 / 2);
   observe(coin = 1);
 else
   skip;

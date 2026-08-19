@@ -15,7 +15,7 @@ Usage (run from the repo root):
 """
 
 from __future__ import annotations
-import argparse, sys, time, json, csv, tracemalloc, resource, platform, io, contextlib
+import argparse, sys, time, json, csv, tracemalloc, resource, platform, io, contextlib, gc
 from pathlib import Path
 
 # Repo layout: this file lives in test/, benchmark_loader.py and
@@ -35,7 +35,9 @@ from prob_slicer.slicer import slice_program, slice_only
 
 # Evaluation utilities: benchmark_loader lives in bench-src/ (see sys.path
 # shim above); evaluator lives alongside this file in test/
-from benchmark_loader import load_benchmarks, list_benchmarks, BENCHMARKS_DIR
+from benchmark_loader import (
+    load_benchmarks, list_benchmarks, load_benchmarks_any_dir, BENCHMARKS_DIR,
+)
 from evaluator import evaluate_benchmark, EvalResult
 
 
@@ -85,6 +87,37 @@ def _peak_rss_kb() -> float:
     if platform.system() == 'Darwin':
         return raw / 1024.0
     return float(raw)
+
+
+def _vm_hwm_kb() -> float | None:
+    """
+    Return the kernel-reported "peak resident set size" (VmHWM, in KB)
+    from /proc/self/status, or None if unavailable (non-Linux, or the
+    sandbox doesn't expose /proc).
+
+    This is a second, independently-computed OS-level peak-RSS source.
+    ru_maxrss (via getrusage) and VmHWM (via /proc) are populated by
+    different kernel code paths; on bare metal they should agree
+    closely, but on some sandboxed/containerized environments
+    getrusage's ru_maxrss is known to under-report relative to what the
+    process actually touched. Comparing the two is a cheap way to tell
+    whether an apparent "Py alloc peak > RSS peak" anomaly is a real
+    measurement bug versus ru_maxrss itself being unreliable in this
+    environment — if VmHWM matches (or exceeds) the tracemalloc peak
+    while ru_maxrss doesn't, that points squarely at ru_maxrss.
+    """
+    if platform.system() != 'Linux':
+        return None
+    try:
+        with open('/proc/self/status') as f:
+            for line in f:
+                if line.startswith('VmHWM:'):
+                    # e.g. "VmHWM:	  123456 kB"
+                    parts = line.split()
+                    return float(parts[1])
+    except (OSError, IndexError, ValueError):
+        pass
+    return None
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -172,6 +205,14 @@ def run_benchmark(
     Returns a result dict suitable for printing or JSON export.
     """
     reset_ids()
+    # Force a full collection before measuring anything. CFG/dependence-
+    # graph objects (networkx DiGraphs, AST nodes) contain reference
+    # cycles that CPython's refcounting alone can't reclaim — without
+    # this, cyclic garbage left over from the *previous* benchmark/variant
+    # run in this process can still be resident when this run's baseline
+    # is captured, polluting both the tracemalloc peak and rss_delta_kb
+    # for this run with memory that isn't actually this run's.
+    gc.collect()
     tracemalloc.start()
     rss_before_kb = _peak_rss_kb()
     t0 = time.perf_counter()
@@ -272,20 +313,49 @@ def run_benchmark(
         # Process-wide OS-level peak RSS (resource.getrusage), normalized to KB
         'peak_rss_kb':  rss_after_kb,
         'rss_delta_kb': rss_delta_kb,
+        # Independent cross-check: kernel-reported peak RSS from
+        # /proc/self/status (Linux only; None elsewhere). If this
+        # disagrees with peak_rss_kb (ru_maxrss) — especially if it's
+        # closer to py_peak_memory_kb — that points to ru_maxrss being
+        # unreliable in this environment rather than a real "Python
+        # allocated more than the OS shows resident" impossibility.
+        'vm_hwm_kb':    _vm_hwm_kb(),
         'phase1_only':   phase1_only,
         'n_while_loops':count_while_loops(prog)
     }
+
+    # cfg/da (networkx DiGraphs with internal reference cycles) are no
+    # longer needed past this point — everything relevant has already
+    # been extracted into `result` above. Drop them explicitly and
+    # collect now rather than leaving them for Python's automatic GC
+    # to notice eventually, so the (possibly long) --evaluate phase
+    # below, and the next benchmark/variant run, start from a clean
+    # slate instead of carrying this run's graph objects along.
+    del cfg, da
+    gc.collect()
+
     if evaluate:
         tracemalloc.start()
         eval_rss_before_kb = _peak_rss_kb()
-        eval_result = evaluate_benchmark(
-            b, variant, prog, sliced_prog,
-            n_runs=n_eval_runs,
-        )
+        try:
+            eval_result = evaluate_benchmark(
+                b, variant, prog, sliced_prog,
+                n_runs=n_eval_runs,
+            )
+            result['eval'] = eval_result
+            result['eval_error'] = None
+        except Exception as e:
+            # Slicing already succeeded (the fields set above are valid) —
+            # don't let a Monte Carlo evaluation failure (e.g. a benchmark
+            # using an unsupported construct like sample_pgf) discard those
+            # results too. Record the failure separately instead.
+            print(f"  [Eval] FAILED for {b['name']!r} variant={variant}: {e}",
+                  flush=True)
+            result['eval'] = None
+            result['eval_error'] = str(e)
         _, eval_peak_bytes = tracemalloc.get_traced_memory()
         tracemalloc.stop()
         eval_rss_after_kb = _peak_rss_kb()
-        result['eval'] = eval_result
         result['eval_py_peak_memory_kb'] = eval_peak_bytes / 1024
         result['eval_peak_rss_kb']       = eval_rss_after_kb
         result['eval_rss_delta_kb']      = eval_rss_after_kb - eval_rss_before_kb
@@ -293,6 +363,98 @@ def run_benchmark(
 
     return result
 
+
+def run_benchmark_isolated(
+    b:           dict,
+    variant:     SliceVariant,
+    bench_dir:   Path,
+    evaluate:    bool = False,
+    n_eval_runs: int = 10_000,
+) -> dict | None:
+    """
+    Run exactly one benchmark x variant in a brand-new `python
+    test_slicer.py --bench ... --variant ...` subprocess, so that
+    peak_rss_kb (resource.getrusage().ru_maxrss) starts from ~0 for
+    this run instead of inheriting the high-water mark of every prior
+    benchmark/variant already run in this process.
+
+    This is the only way to get a peak_rss_kb value that's genuinely
+    comparable across variants of the same benchmark (or across
+    benchmarks) — see --isolate-subprocess help text. tracemalloc's
+    Python-level peak is already isolated per in-process run/variant
+    via start()/stop() pairing in run_benchmark(), so it does not
+    need subprocess isolation for that same reason; it's measured here
+    too only because it's cheap to get alongside the isolated RSS.
+
+    Returns the single result dict (same shape as run_benchmark(),
+    minus 'sliced_src', which save_results_json() doesn't serialise
+    either), or None if the subprocess failed.
+    """
+    import subprocess, tempfile
+    with tempfile.NamedTemporaryFile(
+        mode='w', suffix='.json', delete=False
+    ) as tmp:
+        tmp_path = tmp.name
+    try:
+        cmd = [
+            sys.executable, str(Path(__file__).resolve()),
+            '--bench', b['name'],
+            '--benchdir', str(bench_dir),
+            '--variant', variant,
+            '--save-json', tmp_path,
+        ]
+        if evaluate:
+            cmd += ['--evaluate', '--eval-runs', str(n_eval_runs)]
+
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+        if proc.returncode != 0:
+            print(f"\n[ERROR] Isolated subprocess failed for "
+                  f"{b['name']!r} variant={variant} "
+                  f"(exit {proc.returncode}):")
+            print(proc.stderr[-4000:])
+            return None
+
+        with open(tmp_path) as f:
+            results = json.load(f)
+        if not results:
+            print(f"\n[ERROR] Isolated subprocess for {b['name']!r} "
+                  f"variant={variant} produced no results.")
+            return None
+        result = results[0]
+        # save_results_json() deliberately excludes 'sliced_src' from the
+        # subprocess's JSON output, so it isn't available here — print_
+        # result() etc. still expect a string to call .splitlines() on.
+        result['sliced_src'] = (
+            '  (sliced source not available — produced by an isolated '
+            'subprocess; re-run without --isolate-subprocess to see it)'
+        )
+        # save_results_json()/save_results_csv()/print_comparison() etc.
+        # expect result['eval'] to be an object with attribute access,
+        # including the nested ev.orig_dist.p_term / ev.slice_dist.p_term
+        # shape of the real EvalResult — but it round-trips through JSON
+        # as a flat dict (see save_results_json's serialise()). Rebuild
+        # the same nested shape here so the rest of the pipeline doesn't
+        # need to know this result came from a subprocess.
+        ev = result.get('eval')
+        if isinstance(ev, dict):
+            import types
+            result['eval'] = types.SimpleNamespace(
+                ns_ok=ev['ns_ok'], ni_ok=ev['ni_ok'], nids_ok=ev['nids_ok'],
+                q=ev['q'], tv_shape=ev['tv_shape'], nt_diff=ev['nt_diff'],
+                q1=ev['q1'], q2=ev['q2'],
+                n_runs=ev['n_runs'], elapsed=ev['elapsed'],
+                orig_dist=types.SimpleNamespace(
+                    p_term=ev['orig_term'], p_blocked=ev['orig_blocked'],
+                    p_diverged=ev['orig_nt'],
+                ),
+                slice_dist=types.SimpleNamespace(
+                    p_term=ev['slice_term'], p_blocked=ev['slice_blocked'],
+                    p_diverged=ev['slice_nt'],
+                ),
+            )
+        return result
+    finally:
+        Path(tmp_path).unlink(missing_ok=True)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -396,6 +558,9 @@ def _eval_str(r: dict) -> str:
     """Format evaluation result inline if present."""
     ev = r.get('eval')
     if ev is None:
+        eval_error = r.get('eval_error')
+        if eval_error:
+            return f"  Correctness: EVALUATION FAILED — {eval_error}"
         return ''
     def tick(ok): return '✓' if ok else '✗'
     q_str = f"{ev.q:.3f}" if ev.q is not None else "N/A"
@@ -445,6 +610,10 @@ def print_result(r: dict):
     print(f"  Py alloc  : {r.get('py_peak_memory_kb', 0):.1f} KB peak (slicing)"
           + (f", {r['eval_py_peak_memory_kb']:.1f} KB peak (evaluation)"
              if r.get('eval_py_peak_memory_kb') is not None else ""))
+    if r.get('vm_hwm_kb') is not None:
+        print(f"  VmHWM     : {r['vm_hwm_kb']:.1f} KB (kernel /proc cross-check "
+              f"vs. Peak RSS above — should be close; a large gap means "
+              f"ru_maxrss is unreliable in this environment)")
     print(f"  Expected  : {r['expected']}")
     ev_str = _eval_str(r)
     if ev_str:
@@ -462,7 +631,7 @@ def print_comparison(results: list[dict]):
     if not results:
         return
     name    = results[0]['name']
-    has_eval = any(r.get('eval') is not None for r in results)
+    has_eval = any(r.get('eval') is not None or r.get('eval_error') for r in results)
 
     print(f"\n{'='*65}")
     print(f"  Comparison: {name}")
@@ -500,6 +669,8 @@ def print_comparison(results: list[dict]):
                 f" {q_str:>6}"
                 f" {ev.tv_shape:>6.3f}"
             )
+        elif r.get('eval_error') and has_eval:
+            base += "  EVAL FAILED"
         print(base)
 
     print(f"{'─'*65}")
@@ -520,7 +691,7 @@ def print_comparison(results: list[dict]):
 
 def print_summary(all_results: list[dict]):
     """Print a final summary table across all benchmarks and variants."""
-    has_eval = any(r.get('eval') is not None for r in all_results)
+    has_eval = any(r.get('eval') is not None or r.get('eval_error') for r in all_results)
 
     print(f"\n{'='*72}")
     print("  SUMMARY")
@@ -555,6 +726,8 @@ def print_summary(all_results: list[dict]):
                 f" {tick(ev.ni_ok):>4}"
                 f" {tick(ev.nids_ok):>6}"
             )
+        elif r.get('eval_error') and has_eval:
+            base += "   EVAL FAILED"
         print(base)
 
     print(f"{'─'*72}")
@@ -581,10 +754,13 @@ def print_summary(all_results: list[dict]):
         nids_ok = sum(1 for r in all_results
                       if r.get('eval') and r['eval'].nids_ok)
         n_eval  = sum(1 for r in all_results if r.get('eval'))
+        n_eval_failed = sum(1 for r in all_results if r.get('eval_error'))
         print(f"  Correctness (out of {n_eval} evaluated):")
         print(f"    NS   passed: {ns_ok}/{n_eval}")
         print(f"    NI   passed: {ni_ok}/{n_eval}")
         print(f"    NIDS passed: {nids_ok}/{n_eval}")
+        if n_eval_failed:
+            print(f"    Evaluation failed (unsupported construct, etc.): {n_eval_failed}")
 
     # Memory usage broken down per variant (peak + average across all
     # benchmarks run under that variant, for both memory metrics)
@@ -701,10 +877,12 @@ def save_results_csv(all_results: list[dict], path: str):
             'elapsed_ms':    r.get('elapsed_ms'),
             'peak_rss_kb':          r.get('peak_rss_kb'),
             'rss_delta_kb':         r.get('rss_delta_kb'),
+            'vm_hwm_kb':            r.get('vm_hwm_kb'),
             'py_peak_memory_kb':    r.get('py_peak_memory_kb'),
             'py_current_memory_kb': r.get('py_current_memory_kb'),
             'phase1_only':   r.get('phase1_only'),
             'n_while_loops': r.get('n_while_loops'),
+            'eval_error':    r.get('eval_error'),
         }
         ev = r.get('eval')
         if ev is not None:
@@ -797,7 +975,8 @@ def save_results_xlsx(all_results: list[dict], path: str, sheet_name: str):
     ws = wb.create_sheet(title=sheet_name)
 
     header = ['Benchmark', 'Variant', 'orig', 'slice', 'While',
-              'Reduction', 'ms', 'RSS_KB', 'PY_KB', 'NS', 'NI', 'NIDS']
+              'Reduction', 'ms', 'RSS_KB', 'PY_KB', 'NS', 'NI', 'NIDS',
+              'EvalError']
     ws.append(header)
 
     def tick(ok) -> str:
@@ -820,6 +999,7 @@ def save_results_xlsx(all_results: list[dict], path: str, sheet_name: str):
             tick(ev.ns_ok)   if ev is not None else '',
             tick(ev.ni_ok)   if ev is not None else '',
             tick(ev.nids_ok) if ev is not None else '',
+            r.get('eval_error') or '',
         ])
 
     wb.save(xlsx_path)
@@ -915,6 +1095,22 @@ if __name__ == '__main__':
                     help='Run Monte Carlo correctness evaluation')
     ap.add_argument('--eval-runs', type=int, default=10_000,
                     help='Number of Monte Carlo runs for evaluation')
+    ap.add_argument(
+        '--isolate-subprocess', action='store_true',
+        help=(
+            'Run each benchmark x variant in its own fresh OS subprocess '
+            'instead of in-process. resource.getrusage().ru_maxrss is a '
+            'monotonically non-decreasing high-water mark for the whole '
+            'process, so peak_rss_kb measured in-process across many '
+            'benchmarks/variants is contaminated by earlier runs and is '
+            'NOT comparable between variants of the same benchmark, let '
+            'alone across benchmarks. With --isolate-subprocess, each '
+            'benchmark x variant starts from a clean process (ru_maxrss '
+            'starts at ~0), so peak_rss_kb becomes a genuinely isolated, '
+            'directly-comparable measurement — at the cost of one Python '
+            'process startup per benchmark x variant (slower).'
+        )
+    )
     args = ap.parse_args()
     set_debug(args.debug)
 
@@ -935,12 +1131,24 @@ if __name__ == '__main__':
         print(f"[ERROR] {e}")
         sys.exit(1)
 
+    searched_all_dirs = False
+    if not benchmarks and not args.benchdir and (args.bench or args.tag):
+        # Not found in the default real-world/ directory and no
+        # --benchdir was given — fall back to searching every
+        # benchmarks/<category>/ directory (matches --list's scope).
+        benchmarks = load_benchmarks_any_dir(names=args.bench, tags=args.tag)
+        searched_all_dirs = bool(benchmarks)
+
     if not benchmarks:
         print("[ERROR] No benchmarks matched the given filters.")
         print("        Use --list to see all available benchmarks.")
         sys.exit(1)
 
     bench_dir_used = Path(args.benchdir) if args.benchdir else BENCHMARKS_DIR
+    if searched_all_dirs:
+        dirs_found = sorted({str(Path(b['path']).parent) for b in benchmarks})
+        print(f"\n[INFO] Not found in {bench_dir_used.resolve()} — "
+              f"found in: {', '.join(dirs_found)}")
     print(f"\n[INFO] Loaded {len(benchmarks)} benchmark(s) "
           f"from {bench_dir_used.resolve()}")
 
@@ -950,6 +1158,7 @@ if __name__ == '__main__':
     )
 
     all_results: list[dict] = []
+    failed_runs: list[tuple[str, str, str]] = []  # (name, variant, error)
 
     for b in benchmarks:
         print(f"\n[INFO] Running benchmark: {b['name']} ")
@@ -958,14 +1167,29 @@ if __name__ == '__main__':
         for variant in variants:
             print(f"\n[INFO] Variant: {variant.upper()}")
             try:
-                r = run_benchmark(
-                    b,
-                    variant=variant,
-                    emit_dot=args.dot,
-                    phase1_only=args.phase1,
-                    evaluate=args.evaluate,
-                    n_eval_runs=args.eval_runs,
-                )
+                if args.isolate_subprocess:
+                    this_bench_dir = Path(b['path']).parent
+                    r = run_benchmark_isolated(
+                        b,
+                        variant=variant,
+                        bench_dir=this_bench_dir,
+                        evaluate=args.evaluate,
+                        n_eval_runs=args.eval_runs,
+                    )
+                    if r is None:
+                        failed_runs.append(
+                            (b['name'], variant, 'isolated subprocess failed')
+                        )
+                        continue
+                else:
+                    r = run_benchmark(
+                        b,
+                        variant=variant,
+                        emit_dot=args.dot,
+                        phase1_only=args.phase1,
+                        evaluate=args.evaluate,
+                        n_eval_runs=args.eval_runs,
+                    )
                 per_benchmark_results.append(r)
                 all_results.append(r)
                 print_result(r)
@@ -980,10 +1204,11 @@ if __name__ == '__main__':
 
             except Exception as e:
                 print(f"\n[ERROR] {b['name']!r} variant={variant}: {e}")
-                import traceback; 
+                import traceback;
                 error_string = traceback.format_exc()
                 print(error_string)
                 #traceback.print_exc()
+                failed_runs.append((b['name'], variant, str(e)))
 
         if args.compare and len(per_benchmark_results) > 1:
             print_comparison(per_benchmark_results)
@@ -1008,6 +1233,14 @@ if __name__ == '__main__':
         )
         save_results_xlsx(all_results, args.save_xlsx, sheet_name)
 
+    if failed_runs:
+        print(f"\n{'─'*72}")
+        print(f"  FAILED ({len(failed_runs)} benchmark x variant run(s)):")
+        for name, variant, err in failed_runs:
+            first_line = err.splitlines()[0] if err else ''
+            print(f"    {name}  variant={variant.upper()}  — {first_line}")
+        print(f"{'─'*72}")
+
     print(f"\n[DONE] {len(all_results)} experiment(s) completed "
           f"({len(benchmarks)} benchmark(s) x "
-          f"{len(variants)} variant(s)).")
+          f"{len(variants)} variant(s)), {len(failed_runs)} failed.")

@@ -5,11 +5,11 @@
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated inference
 
-aliceDunnit :~ unif[0, 1];
+aliceDunnit :~ bernoulli(3 / 10);
 if (aliceDunnit = 1) then
-  withGun :~ unif[0, 1];
+  withGun :~ bernoulli(p);
 else
-  withGun :~ unif[0, 1];
+  withGun :~ bernoulli(4 / 5);
 end
 observe(withGun = 1);
 return withGun;

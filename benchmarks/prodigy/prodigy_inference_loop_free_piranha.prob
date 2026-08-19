@@ -5,11 +5,11 @@
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated inference
 
-piranha :~ unif[0, 1];
+piranha :~ bernoulli(1 / 2);
 if (piranha = 1) then
   fish_taken_is_piranha := 1;
 else
-  fish_taken_is_piranha :~ unif[0, 1];
+  fish_taken_is_piranha :~ bernoulli(1 / 2);
 end
 observe(fish_taken_is_piranha = 1);
 return fish_taken_is_piranha;

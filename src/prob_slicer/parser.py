@@ -18,7 +18,7 @@ from __future__ import annotations
 import re
 from typing import List, Tuple
 from .ast_nodes import (
-    AInt, AReal, AVar, ANeg, ABinOp,
+    AInt, AReal, AVar, ANeg, ABinOp, ASamplePGF,
     BTrue, BFalse, BCompare, BNot, BBinOp, Cmd,
     DUnif, DBernoulli, DGaussian, DDiscrete,
     CSkip, CAssign, CSample, CSeq, CIf, CWhile, CObserve,
@@ -231,6 +231,8 @@ class Parser:
             self.consume()
             return AInt(int(val))
         if kind == 'ID':
+            if val == 'sample_pgf':
+                return self.parse_sample_pgf()
             self.consume()
             return AVar(val)
         if val == '-':
@@ -247,6 +249,28 @@ class Parser:
             f"Unexpected token in arithmetic expression: "
             f"{kind!r} ({val!r})",
             line, col)
+
+    def parse_sample_pgf(self):
+        """
+        sample_pgf(expr, var) — Prodigy pGCL builtin (see ASamplePGF in
+        ast_nodes.py). Parsed structurally only; not executable by the
+        Monte Carlo evaluator.
+        """
+        self.consume(expected_val='sample_pgf')
+        self.consume(expected_val='(')
+        expr = self.parse_aexpr()
+        self.consume(expected_val=',')
+        var_t = self.peek()
+        if var_t is None or var_t[0] != 'ID':
+            raise ParseError(
+                "Expected a variable name as the second argument to "
+                "sample_pgf(...)",
+                *(var_t[2:4] if var_t else (None, None)))
+        var_name = var_t[1]
+        self.consume()
+        self.consume(expected_val=')')
+        return ASamplePGF(expr=expr, var=var_name)
+
     # ── Boolean expressions ──────────────────────────────────────────────────
 
     def parse_bexpr(self, min_prec: int = 0):

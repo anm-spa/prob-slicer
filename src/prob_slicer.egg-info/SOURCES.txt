@@ -4,10 +4,8 @@ src/prob_slicer/__init__.py
 src/prob_slicer/ast_nodes.py
 src/prob_slicer/cfg_builder.py
 src/prob_slicer/dependence.py
-src/prob_slicer/dependence_old.py
 src/prob_slicer/parser.py
 src/prob_slicer/slicer.py
-src/prob_slicer/slicer_old.py
 src/prob_slicer.egg-info/PKG-INFO
 src/prob_slicer.egg-info/SOURCES.txt
 src/prob_slicer.egg-info/dependency_links.txt

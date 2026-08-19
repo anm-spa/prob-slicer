@@ -17,8 +17,9 @@ from pathlib import Path
 from typing import Any
 
 # benchmarks/ lives at the repo root, one level up from bench-src/
-REPO_ROOT = Path(__file__).resolve().parent.parent
-BENCHMARKS_DIR = REPO_ROOT / 'benchmarks' / 'real-world'
+REPO_ROOT      = Path(__file__).resolve().parent.parent
+BENCHMARKS_ROOT = REPO_ROOT / 'benchmarks'
+BENCHMARKS_DIR = BENCHMARKS_ROOT / 'real-world'
 
 # Regex to match metadata lines: // @METADATA:key = value
 _META_RE = re.compile(
@@ -152,11 +153,46 @@ def load_benchmarks(
     return benchmarks
 
 
-def list_benchmarks(benchmarks_dir: str | Path | None = None) -> None:
-    """Print a summary table of all available benchmarks."""
-    benchmarks = load_benchmarks(benchmarks_dir=benchmarks_dir)
-    bench_dir  = Path(benchmarks_dir) if benchmarks_dir else BENCHMARKS_DIR
-    print(f"\n{'='*72}")
+def load_benchmarks_any_dir(
+    names: list[str] | None = None,
+    tags:  list[str] | None = None,
+) -> list[dict[str, Any]]:
+    """
+    Search every category subdirectory under benchmarks/ (real-world/,
+    prodigy/, contrived/, literature/, ...) for benchmarks matching
+    `names` and/or `tags`, and return the combined results.
+
+    Used as a fallback by --bench/--tag when no --benchdir is given and
+    the benchmark isn't found in the default benchmarks/real-world/
+    directory — since --list now shows benchmarks from every category,
+    --bench should be able to find them there too without requiring
+    the caller to know which subdirectory a benchmark lives in.
+
+    If the same benchmark name exists in more than one directory, all
+    matches are returned (each will carry its own 'path').
+    """
+    found: list[dict[str, Any]] = []
+    for d in discover_benchmark_dirs():
+        found.extend(load_benchmarks(tags=tags, names=names, benchmarks_dir=d))
+    return found
+
+
+def discover_benchmark_dirs(root: str | Path | None = None) -> list[Path]:
+    """
+    Return every immediate subdirectory of benchmarks/ that contains at
+    least one .prob file (e.g. real-world/, prodigy/, contrived/, ...),
+    sorted by name.
+    """
+    base = Path(root) if root else BENCHMARKS_ROOT
+    if not base.exists():
+        return []
+    return sorted(
+        d for d in base.iterdir()
+        if d.is_dir() and any(d.glob('*.prob'))
+    )
+
+
+def _print_benchmark_table(benchmarks: list[dict[str, Any]]) -> None:
     print(f"  {'Name':<32} {'Criterion':<12} {'Tags'}")
     print(f"{'─'*72}")
     for b in benchmarks:
@@ -164,7 +200,44 @@ def list_benchmarks(benchmarks_dir: str | Path | None = None) -> None:
         if len(b['tags']) > 3:
             tags += ', ...'
         print(f"  {b['name']:<32} {b['criterion']:<12} {tags}")
-    print(f"{'='*72}")
-    print(f"  Total: {len(benchmarks)} benchmarks")
-    print(f"  Location: {bench_dir.resolve()}")
+
+
+def list_benchmarks(benchmarks_dir: str | Path | None = None) -> None:
+    """
+    Print a summary table of available benchmarks.
+
+    If `benchmarks_dir` is given explicitly, only that single directory
+    is listed (previous behaviour). If not given, every category
+    subdirectory under benchmarks/ (real-world/, prodigy/, contrived/,
+    literature/, ...) is discovered and listed, with a per-directory
+    and grand total count.
+    """
+    if benchmarks_dir:
+        bench_dir  = Path(benchmarks_dir)
+        benchmarks = load_benchmarks(benchmarks_dir=bench_dir)
+        print(f"\n{'='*72}")
+        _print_benchmark_table(benchmarks)
+        print(f"{'='*72}")
+        print(f"  Total: {len(benchmarks)} benchmarks")
+        print(f"  Location: {bench_dir.resolve()}")
+        print()
+        return
+
+    dirs = discover_benchmark_dirs()
+    if not dirs:
+        print(f"\n[WARNING] No benchmark directories with .prob files found "
+              f"under {BENCHMARKS_ROOT.resolve()}")
+        return
+
+    grand_total = 0
+    print(f"\n{'='*72}")
+    for d in dirs:
+        benchmarks = load_benchmarks(benchmarks_dir=d)
+        grand_total += len(benchmarks)
+        print(f"  {d.name}/  ({len(benchmarks)} benchmarks)")
+        print(f"{'─'*72}")
+        _print_benchmark_table(benchmarks)
+        print(f"{'='*72}")
+    print(f"  Grand total: {grand_total} benchmarks across {len(dirs)} directories")
+    print(f"  Location: {BENCHMARKS_ROOT.resolve()}")
     print()

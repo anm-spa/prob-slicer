@@ -74,6 +74,30 @@ class ABinOp(AExpr):
     def __str__(self): return f"({self.left} {self.op} {self.right})"
 
 
+@dataclass
+class ASamplePGF(AExpr):
+    """
+    sample_pgf(expr, var) — Prodigy pGCL construct (see
+    LKlinke/Prodigy): resamples `var` from the distribution whose
+    probability generating function is `expr`, an arbitrary closed-form
+    rational expression over program variables (not a fixed parametric
+    family like bernoulli(p)).
+
+    Parsed for structural completeness only, so that dependence analysis
+    and slicing work correctly (`vars()` reports the variables `expr`
+    depends on, plus `var` itself, since these invariant-checking programs
+    define `var` recursively in terms of its own prior value). It is NOT
+    executable: the Monte Carlo evaluator raises NotImplementedError if
+    asked to sample from it, since doing so would require extracting a
+    PMF from an arbitrary closed-form PGF (e.g. via symbolic Taylor-
+    coefficient extraction), which prob_slicer does not implement.
+    """
+    expr: AExpr
+    var: str
+    def vars(self): return self.expr.vars() | {self.var}
+    def __str__(self): return f"sample_pgf({self.expr}, {self.var})"
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # Boolean Expressions
 # ═══════════════════════════════════════════════════════════════════════════════

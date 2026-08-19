@@ -5,7 +5,7 @@
 // @METADATA:expected    = unknown
 // @METADATA:tags        = prodigy translated inference
 
-x :~ unif[0, 1];
+x :~ bernoulli(2 / 7);
 if (x = 0) then
   d :~ unif[0, 1];
 else

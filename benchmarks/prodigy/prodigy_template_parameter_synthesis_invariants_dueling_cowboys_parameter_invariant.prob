@@ -7,10 +7,10 @@
 
 if (c = 1 && t <= 1) then
   if (t = 0) then
-    t :~ unif[0, 1];
+    t :~ bernoulli(( 1 - a ) * b / ( 1 - ( 1 - a ) * ( 1 - b ) ));
     c := 0;
   else
-    t :~ unif[0, 1];
+    t :~ bernoulli(b / ( 1 - ( 1 - a ) * ( 1 - b ) ));
     c := 0;
   end
 else

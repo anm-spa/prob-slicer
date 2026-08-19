@@ -274,9 +274,21 @@ class Parser:
             self.consume(TK_RPAREN)
             return ('sample', f'unif[{lo.strip()}, {hi.strip()}]')
 
-        # known distributions
+        # bernoulli(p) — ProbLang has a real bernoulli(p) distribution,
+        # so preserve the exact probability expression instead of
+        # discarding it and approximating with a 50/50 unif[0,1].
+        if tk == TK_IDENT and tv == 'bernoulli':
+            self.pos += 1
+            self.consume(TK_LPAREN)
+            p = self.parse_expr_raw({TK_RPAREN})
+            self.consume(TK_RPAREN)
+            return ('sample', f'bernoulli({p.strip()})')
+
+        # other known distributions with no ProbLang equivalent — best
+        # effort placeholder (probability information is genuinely lost
+        # here, since ProbLang has no geometric/poisson/binomial/etc.)
         if tk == TK_IDENT and tv in (
-                'geometric', 'bernoulli', 'poisson', 'iid',
+                'geometric', 'poisson', 'iid',
                 'binomial', 'negativebinomial', 'hypergeometric'):
             self.pos += 1
             self.consume(TK_LPAREN)
@@ -479,6 +491,22 @@ class Parser:
 # Top-level translation
 # ---------------------------------------------------------------------------
 
+_QUERY_VAR_RE = re.compile(r'\?\s*Pr\s*\[\s*([A-Za-z_][A-Za-z0-9_]*)\s*\]')
+
+
+def _extract_query_var(src: str) -> str | None:
+    """
+    pGCL programs end with a `?Pr[var]` (or `?Pr[var1, var2]`) directive
+    naming the actual query variable(s). The tokeniser treats `?...`
+    lines as directives and skips them, so without this the criterion
+    heuristic falls back to "last assigned variable before end of
+    program" — which is often a throwaway/reset variable, not the real
+    query variable. Return the first named variable, if any.
+    """
+    m = _QUERY_VAR_RE.search(src)
+    return m.group(1) if m else None
+
+
 def translate(src: str, name: str) -> str:
     """Translate a pGCL source string to prob-slicer language."""
     try:
@@ -486,8 +514,10 @@ def translate(src: str, name: str) -> str:
         parser = Parser(tokens)
         lines  = parser.parse_program()
 
-        # Infer criterion: last assigned/sampled variable before return
-        criterion = _infer_criterion(lines)
+        # Prefer the pGCL source's own `?Pr[var]` query directive as the
+        # criterion; fall back to the last-assigned-variable heuristic
+        # only if no such directive is present.
+        criterion = _extract_query_var(src) or _infer_criterion(lines)
 
         # Strip trailing skips and add return
         while lines and lines[-1].strip() == 'skip':
@@ -561,7 +591,7 @@ def convert_file(
         bench_name = f'prodigy_{flat_name}'
         print("DEBUG: converting", src_path, "->", bench_name, flush=True)
         translated = translate(src, flat_name)
-        criterion  = _infer_criterion(translated.splitlines())
+        criterion  = _extract_query_var(src) or _infer_criterion(translated.splitlines())
 
         content = _format_benchmark_source(
             name        = bench_name,
